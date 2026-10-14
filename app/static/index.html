@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tenerife AI</title>
+<style>
+  :root {
+    --brand: #1E6FA8;
+    --brand-dark: #17567f;
+    --accent: #F59E00;
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --text: #15202b;
+    --muted: #5c6b7a;
+    --line: #e3e8ee;
+    --user: #1E6FA8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1419; --panel: #171e26; --text: #e7edf3; --muted: #93a2b1;
+      --line: #27323d; --brand: #4a9ed6; --brand-dark: #3b87ba;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1419; --panel: #171e26; --text: #e7edf3; --muted: #93a2b1;
+    --line: #27323d; --brand: #4a9ed6; --brand-dark: #3b87ba;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    display: flex; flex-direction: column; min-height: 100dvh;
+  }
+  header {
+    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+    color: #fff; padding: 18px 16px; display: flex; align-items: center; gap: 12px;
+  }
+  header .mark { font-size: 26px; line-height: 1; }
+  header h1 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.2px; }
+  header p { margin: 2px 0 0; font-size: 13px; opacity: .85; }
+  main {
+    flex: 1; width: 100%; max-width: 760px; margin: 0 auto;
+    padding: 16px; display: flex; flex-direction: column; gap: 14px;
+  }
+  .intro { color: var(--muted); font-size: 14px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    border-radius: 999px; padding: 7px 13px; font-size: 13px; cursor: pointer;
+  }
+  .chip:hover { border-color: var(--brand); color: var(--brand); }
+  .msg { display: flex; }
+  .msg.me { justify-content: flex-end; }
+  .bubble {
+    max-width: 88%; padding: 12px 15px; border-radius: 16px;
+    background: var(--panel); border: 1px solid var(--line);
+    white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .msg.me .bubble { background: var(--user); color: #fff; border-color: transparent; border-bottom-right-radius: 5px; }
+  .msg.ai .bubble { border-bottom-left-radius: 5px; }
+  .sources { margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .sources h4 { margin: 0 0 7px; font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+  .src { display: flex; align-items: baseline; gap: 8px; font-size: 13px; padding: 3px 0; }
+  .tag {
+    font-size: 10px; letter-spacing: .05em; text-transform: uppercase; font-weight: 700;
+    padding: 2px 7px; border-radius: 5px; background: var(--brand); color: #fff; flex: none;
+  }
+  .tag.guide { background: var(--accent); color: #3a2600; }
+  .score { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; flex: none; }
+  form { position: sticky; bottom: 0; background: var(--bg); padding: 12px 0 16px; display: flex; gap: 9px; }
+  input {
+    flex: 1; padding: 13px 15px; font-size: 16px; border-radius: 12px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--text);
+  }
+  input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  button {
+    padding: 0 20px; font-size: 15px; font-weight: 650; border: 0; border-radius: 12px;
+    background: var(--brand); color: #fff; cursor: pointer;
+  }
+  button:disabled { opacity: .55; cursor: default; }
+  .dots span {
+    display: inline-block; width: 7px; height: 7px; margin-right: 4px; border-radius: 50%;
+    background: var(--muted); animation: b 1.2s infinite;
+  }
+  .dots span:nth-child(2) { animation-delay: .18s } .dots span:nth-child(3) { animation-delay: .36s }
+  @keyframes b { 0%,60%,100% { opacity:.25; transform: translateY(0) } 30% { opacity:1; transform: translateY(-3px) } }
+</style>
+</head>
+<body>
+<header>
+  <div class="mark">🌋</div>
+  <div>
+    <h1>Tenerife AI</h1>
+    <p>Ask about events, venues and things to do</p>
+  </div>
+</header>
+
+<main>
+  <div class="intro" id="intro">
+    Answers come only from TenerInfo's own events, venues and tours, plus a Tenerife travel guide.
+    If the sources don't cover it, it will say so rather than guess.
+  </div>
+  <div class="chips" id="chips"></div>
+  <div id="thread"></div>
+  <form id="form" autocomplete="off">
+    <input id="q" placeholder="e.g. where can I watch football tonight?" required>
+    <button id="send">Ask</button>
+  </form>
+</main>
+
+<script>
+const thread = document.getElementById('thread');
+const form = document.getElementById('form');
+const input = document.getElementById('q');
+const send = document.getElementById('send');
+const intro = document.getElementById('intro');
+
+const EXAMPLES = [
+  'What live music is on in Los Cristianos?',
+  'Where can I watch football tonight?',
+  'Somewhere to take the kids to swim',
+  'Good tapas in Costa Adeje',
+];
+const chips = document.getElementById('chips');
+EXAMPLES.forEach(text => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'chip'; b.textContent = text;
+  b.onclick = () => { input.value = text; form.requestSubmit(); };
+  chips.appendChild(b);
+});
+
+function bubble(who, node) {
+  const row = document.createElement('div');
+  row.className = 'msg ' + who;
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.append(node);
+  row.append(b);
+  thread.append(row);
+  row.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  return b;
+}
+
+function renderSources(list) {
+  if (!list || !list.length) return null;
+  const wrap = document.createElement('div');
+  wrap.className = 'sources';
+  wrap.innerHTML = '<h4>Sources</h4>';
+  for (const s of list) {
+    const row = document.createElement('div');
+    row.className = 'src';
+    const tag = document.createElement('span');
+    tag.className = 'tag' + (s.type === 'guide' ? ' guide' : '');
+    tag.textContent = s.type;
+    const title = document.createElement('span');
+    title.textContent = s.title;
+    const score = document.createElement('span');
+    score.className = 'score';
+    score.textContent = s.score;
+    row.append(tag, title, score);
+    wrap.append(row);
+  }
+  return wrap;
+}
+
+form.onsubmit = async (e) => {
+  e.preventDefault();
+  const question = input.value.trim();
+  if (!question) return;
+  intro.style.display = chips.style.display = 'none';
+  input.value = '';
+  send.disabled = true;
+  bubble('me', document.createTextNode(question));
+
+  const dots = document.createElement('span');
+  dots.className = 'dots';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  const pending = bubble('ai', dots);
+
+  try {
+    const res = await fetch('/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question }),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    pending.textContent = data.answer;
+    const srcs = renderSources(data.sources);
+    if (srcs) pending.append(srcs);
+  } catch (err) {
+    pending.textContent = 'Something went wrong: ' + err.message;
+  } finally {
+    send.disabled = false;
+    input.focus();
+  }
+};
+</script>
+</body>
+</html>
