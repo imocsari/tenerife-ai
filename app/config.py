@@ -24,7 +24,11 @@ EMBED_DIM = 384          # must match EMBED_MODEL; used for the pgvector column
 
 # --- LLM --------------------------------------------------------------------
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama")  # "ollama" or "claude"
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "llama3.2")
+# qwen2.5:7b, not llama3.2 (2026-10-14): tool calling is the job now, and llama3.2 at 3B
+# cannot do it — it answered "I don't know" to questions whose data was in front of it, and
+# described tool calls in prose instead of making them. 7B is the realistic floor here, and
+# fits a 16GB machine alongside everything else.
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
 MAX_TOKENS = 600
 

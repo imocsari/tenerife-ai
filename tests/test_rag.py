@@ -38,11 +38,67 @@ def test_retrieve_merges_sources_by_score(monkeypatch):
     assert [r["title"] for r in results] == ["Jazz Night", "Guide"]
 
 
-def test_ask_returns_answer_and_sources(monkeypatch):
-    monkeypatch.setattr(rag, "retrieve", lambda q: [source("Beach", 0.9)])
-    monkeypatch.setattr(rag.llm, "generate", lambda system, message: "Try Playa de las Vistas (Source 1).")
+def test_ask_reports_the_sources_the_search_tool_actually_used(monkeypatch):
+    """ask() no longer retrieves up front — the model does, by calling search_tenerinfo.
+    So the fake stands in for the model, and calls the tool the way the model would."""
+    from app.tools import knowledge
+
+    monkeypatch.setattr(rag, "retrieve", lambda q, top_k=6: [source("Beach", 0.9)])
+
+    def fake_model(system, question):
+        knowledge.search_tenerinfo("where to swim")      # the model reaching for the tool
+        return "Try Playa de las Vistas."
+
+    monkeypatch.setattr(rag.llm, "generate_with_tools", fake_model)
 
     result = rag.ask("Where to swim?")
 
-    assert result["answer"] == "Try Playa de las Vistas (Source 1)."
+    assert result["answer"] == "Try Playa de las Vistas."
     assert result["sources"] == [{"type": "guide", "title": "Beach", "url": None, "score": 0.9}]
+
+
+def test_ask_reports_no_sources_when_no_search_happened(monkeypatch):
+    """A weather-only question searches nothing, and must not claim sources it never read."""
+    monkeypatch.setattr(rag.llm, "generate_with_tools", lambda s, q: "It is 24C and overcast.")
+
+    assert rag.ask("Weather in Los Gigantes?")["sources"] == []
+
+
+def test_ask_deduplicates_a_source_found_by_two_searches(monkeypatch):
+    """The model often searches twice with different wording; the same venue must appear once,
+    at its best score, rather than twice in the source list."""
+    from app.tools import knowledge
+
+    scores = iter([0.6, 0.9])
+    monkeypatch.setattr(rag, "retrieve", lambda q, top_k=6: [source("Beach", next(scores))])
+
+    def fake_model(system, question):
+        knowledge.search_tenerinfo("swim")
+        knowledge.search_tenerinfo("beach")
+        return "Playa de las Vistas."
+
+    monkeypatch.setattr(rag.llm, "generate_with_tools", fake_model)
+
+    assert rag.ask("Where to swim?")["sources"] == [
+        {"type": "guide", "title": "Beach", "url": None, "score": 0.9}
+    ]
+
+
+def test_tool_failures_come_back_as_text_not_exceptions():
+    """A broken tool must return something the model can read and recover from — if it raised,
+    one failing API would take down the whole answer."""
+    from app import tools
+
+    assert "No such tool" in tools.run("no_such_tool", {})
+    assert "Wrong arguments" in tools.run("get_weather", {"nonsense": 1})
+
+
+def test_every_tool_is_offered_to_both_providers():
+    """The schemas are written once and translated; a tool missing from one provider's list
+    would silently work on Claude and not on Ollama."""
+    from app import tools
+
+    claude = {t["name"] for t in tools.anthropic_schemas()}
+    ollama = {t["function"]["name"] for t in tools.ollama_schemas()}
+
+    assert claude == ollama == set(tools.REGISTRY)
