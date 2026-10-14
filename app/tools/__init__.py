@@ -3,13 +3,16 @@
 # provider wants. Claude and Ollama disagree on the envelope but agree on JSON Schema,
 # so the schema is written once here and translated, rather than maintained twice.
 
-from app.tools import geocode, knowledge, weather
+from app.tools import air_quality, geocode, holidays, knowledge, marine, weather
 
 # name -> {"description", "parameters" (JSON Schema), "run" (callable)}
 REGISTRY = {
     **knowledge.TOOLS,
     **geocode.TOOLS,
     **weather.TOOLS,
+    **marine.TOOLS,
+    **air_quality.TOOLS,
+    **holidays.TOOLS,
 }
 
 
