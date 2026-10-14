@@ -29,7 +29,9 @@ LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama")  # "ollama" or "claude"
 # described tool calls in prose instead of making them. 7B is the realistic floor here, and
 # fits a 16GB machine alongside everything else.
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
-CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5-20251001")
+# The bare id, not the dated snapshot: both resolve to the same model today, but the dated
+# form pins to one snapshot forever, so the app would never pick up a newer Haiku 4.5 build.
+CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
 MAX_TOKENS = 600
 
 # --- Database ---------------------------------------------------------------
