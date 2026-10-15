@@ -60,3 +60,8 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
 # Hobby instance is a fixed 2GB.
 ENV WEB_CONCURRENCY=1
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-80} --workers ${WEB_CONCURRENCY}"]
+
+# Note on duration and memory: with a container image these are NOT set in vercel.json — the
+# `functions` key there matches built serverless functions, and a container has none, which
+# fails the build with "doesn't match any Serverless Functions inside the api directory".
+# Set them in the dashboard instead: Settings -> Functions.
