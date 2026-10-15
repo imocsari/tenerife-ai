@@ -2,132 +2,229 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tenerife AI</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tenerinfo AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* Palette lifted from the app's own src/constants/colors.ts, so the two read as one product. */
   :root {
-    --brand: #1E6FA8;
-    --brand-dark: #17567f;
-    --accent: #F59E00;
-    --bg: #f6f7f9;
-    --panel: #ffffff;
-    --text: #15202b;
-    --muted: #5c6b7a;
-    --line: #e3e8ee;
-    --user: #1E6FA8;
+    --primary: #1565C0;        --primary-light: #2196F3;   --primary-dark: #0D3B6E;
+    --warm: #F59E00;           --warm-light: #FCD34D;
+    --bg: #F8F9FA;             --card: #FFFFFF;
+    --text: #1A1A2E;           --text-2: #6B7280;          --line: #E5E7EB;
+    --glass: rgba(255,255,255,.72);
+    --glass-line: rgba(255,255,255,.9);
+    --shadow: 0 10px 40px -12px rgba(13,59,110,.22);
+    --glow: 0 0 28px -6px rgba(33,150,243,.55);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0f1419; --panel: #171e26; --text: #e7edf3; --muted: #93a2b1;
-      --line: #27323d; --brand: #4a9ed6; --brand-dark: #3b87ba;
+      --primary: #42A5F5;      --primary-light: #64B5F6;   --primary-dark: #1565C0;
+      --bg: #0D1117;           --card: #161B22;
+      --text: #F0F2F5;         --text-2: #9BA5B4;          --line: #2D333B;
+      --glass: rgba(22,27,34,.66);
+      --glass-line: rgba(255,255,255,.08);
+      --shadow: 0 10px 40px -12px rgba(0,0,0,.6);
+      --glow: 0 0 32px -6px rgba(66,165,245,.45);
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0f1419; --panel: #171e26; --text: #e7edf3; --muted: #93a2b1;
-    --line: #27323d; --brand: #4a9ed6; --brand-dark: #3b87ba;
+    --primary: #42A5F5; --primary-light: #64B5F6; --primary-dark: #1565C0;
+    --bg: #0D1117; --card: #161B22; --text: #F0F2F5; --text-2: #9BA5B4; --line: #2D333B;
+    --glass: rgba(22,27,34,.66); --glass-line: rgba(255,255,255,.08);
+    --shadow: 0 10px 40px -12px rgba(0,0,0,.6); --glow: 0 0 32px -6px rgba(66,165,245,.45);
   }
+
   * { box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
     margin: 0; background: var(--bg); color: var(--text);
-    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    display: flex; flex-direction: column; min-height: 100dvh;
+    font: 16px/1.6 Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    display: flex; flex-direction: column; overflow-x: hidden;
   }
+
+  /* Slow aurora in the brand blue and the app's amber. Sits behind everything, never moves
+     with the content, and stops entirely for anyone who asked for less motion. */
+  .aurora { position: fixed; inset: -30% -10% auto -10%; height: 70vh; z-index: 0; pointer-events: none;
+            filter: blur(70px); opacity: .5; }
+  .aurora i { position: absolute; display: block; border-radius: 50%; mix-blend-mode: multiply; }
+  @media (prefers-color-scheme: dark) { .aurora i { mix-blend-mode: screen; } .aurora { opacity: .4 } }
+  .aurora i:nth-child(1) { width: 52vw; height: 52vw; left: -6vw;  top: 2vh;  background: var(--primary-light); animation: drift 24s ease-in-out infinite; }
+  .aurora i:nth-child(2) { width: 40vw; height: 40vw; right: -4vw; top: 10vh; background: var(--warm);          animation: drift 31s ease-in-out infinite reverse; }
+  .aurora i:nth-child(3) { width: 34vw; height: 34vw; left: 38vw;  top: 26vh; background: var(--primary);       animation: drift 27s ease-in-out infinite; }
+  @keyframes drift {
+    0%,100% { transform: translate3d(0,0,0) scale(1); }
+    33%     { transform: translate3d(5vw,-4vh,0) scale(1.12); }
+    66%     { transform: translate3d(-4vw,5vh,0) scale(.93); }
+  }
+
   header {
-    background: linear-gradient(135deg, var(--brand), var(--brand-dark));
-    color: #fff; padding: 18px 16px; display: flex; align-items: center; gap: 12px;
+    position: sticky; top: 0; z-index: 3;
+    backdrop-filter: blur(18px) saturate(160%); -webkit-backdrop-filter: blur(18px) saturate(160%);
+    background: var(--glass); border-bottom: 1px solid var(--glass-line);
+    padding: 14px max(16px, env(safe-area-inset-left)) 14px max(16px, env(safe-area-inset-right));
+    display: flex; align-items: center; gap: 13px;
   }
-  header .mark { font-size: 26px; line-height: 1; }
-  header h1 { margin: 0; font-size: 19px; font-weight: 700; letter-spacing: -.2px; }
-  header p { margin: 2px 0 0; font-size: 13px; opacity: .85; }
+  .orb {
+    width: 40px; height: 40px; border-radius: 13px; flex: none; position: relative;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary) 55%, var(--warm));
+    box-shadow: var(--glow);
+    display: grid; place-items: center; font-size: 20px;
+    animation: breathe 5s ease-in-out infinite;
+  }
+  @keyframes breathe { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-3px) } }
+  header h1 {
+    margin: 0; font: 700 20px/1.15 "Space Grotesk", Inter, sans-serif; letter-spacing: -.02em;
+    background: linear-gradient(100deg, var(--text), var(--primary) 70%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  header p { margin: 1px 0 0; font-size: 12.5px; color: var(--text-2); letter-spacing: .01em; }
+
   main {
-    flex: 1; width: 100%; max-width: 760px; margin: 0 auto;
-    padding: 16px; display: flex; flex-direction: column; gap: 14px;
+    position: relative; z-index: 1; flex: 1; width: 100%; max-width: 780px;
+    margin: 0 auto; padding: 20px 16px 0;
+    display: flex; flex-direction: column; gap: 16px;
   }
-  .intro { color: var(--muted); font-size: 14px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .intro { color: var(--text-2); font-size: 14.5px; max-width: 60ch; }
+  .intro b { color: var(--text); font-weight: 600; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
   .chip {
-    border: 1px solid var(--line); background: var(--panel); color: var(--text);
-    border-radius: 999px; padding: 7px 13px; font-size: 13px; cursor: pointer;
+    font: 500 13px Inter, sans-serif; cursor: pointer; color: var(--text);
+    padding: 9px 15px; border-radius: 999px; border: 1px solid var(--line);
+    background: var(--glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    transition: transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s, box-shadow .18s;
   }
-  .chip:hover { border-color: var(--brand); color: var(--brand); }
-  .msg { display: flex; }
+  .chip:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: var(--glow); }
+
+  .msg { display: flex; animation: rise .4s cubic-bezier(.2,.8,.2,1) both; }
   .msg.me { justify-content: flex-end; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: none } }
+
   .bubble {
-    max-width: 88%; padding: 12px 15px; border-radius: 16px;
-    background: var(--panel); border: 1px solid var(--line);
-    white-space: pre-wrap; overflow-wrap: anywhere;
+    max-width: 86%; padding: 14px 17px; border-radius: 20px; font-size: 15.5px;
+    background: var(--glass); border: 1px solid var(--glass-line);
+    backdrop-filter: blur(14px) saturate(150%); -webkit-backdrop-filter: blur(14px) saturate(150%);
+    box-shadow: var(--shadow); white-space: pre-wrap; overflow-wrap: anywhere;
   }
-  .msg.me .bubble { background: var(--user); color: #fff; border-color: transparent; border-bottom-right-radius: 5px; }
-  .msg.ai .bubble { border-bottom-left-radius: 5px; }
-  .sources { margin-top: 11px; padding-top: 10px; border-top: 1px dashed var(--line); }
-  .sources h4 { margin: 0 0 7px; font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
-  .src { display: flex; align-items: baseline; gap: 8px; font-size: 13px; padding: 3px 0; }
+  .msg.ai .bubble { border-bottom-left-radius: 7px; }
+  .msg.me .bubble {
+    border-bottom-right-radius: 7px; color: #fff; border-color: transparent;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    box-shadow: var(--glow);
+  }
+  .bubble strong { font-weight: 600; }
+
+  .sources { margin-top: 13px; padding-top: 11px; border-top: 1px solid var(--line); }
+  .sources h4 {
+    margin: 0 0 8px; font: 600 10.5px Inter, sans-serif; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--text-2);
+  }
+  .src { display: flex; align-items: center; gap: 9px; font-size: 13.5px; padding: 4px 0; }
   .tag {
-    font-size: 10px; letter-spacing: .05em; text-transform: uppercase; font-weight: 700;
-    padding: 2px 7px; border-radius: 5px; background: var(--brand); color: #fff; flex: none;
+    font: 700 9.5px Inter, sans-serif; letter-spacing: .07em; text-transform: uppercase;
+    padding: 3px 8px; border-radius: 6px; color: #fff; flex: none;
+    background: var(--tag, var(--primary)); box-shadow: 0 0 14px -4px var(--tag, var(--primary));
   }
-  .tag.guide { background: var(--accent); color: #3a2600; }
-  .score { margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; flex: none; }
-  form { position: sticky; bottom: 0; background: var(--bg); padding: 12px 0 16px; display: flex; gap: 9px; }
+  .src .what { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .score {
+    margin-left: auto; flex: none; font-variant-numeric: tabular-nums;
+    font-size: 12px; color: var(--text-2);
+  }
+
+  form {
+    position: sticky; bottom: 0; z-index: 2; display: flex; gap: 10px;
+    padding: 14px 0 max(16px, env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--bg) 62%, transparent);
+  }
+  .field { position: relative; flex: 1; }
   input {
-    flex: 1; padding: 13px 15px; font-size: 16px; border-radius: 12px;
-    border: 1px solid var(--line); background: var(--panel); color: var(--text);
+    width: 100%; padding: 15px 17px; font: 400 16px Inter, sans-serif;
+    color: var(--text); background: var(--glass); border: 1px solid var(--line);
+    border-radius: 16px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    transition: border-color .2s, box-shadow .2s;
   }
-  input:focus { outline: 2px solid var(--brand); outline-offset: -1px; }
+  input:focus { outline: none; border-color: var(--primary); box-shadow: var(--glow); }
   button {
-    padding: 0 20px; font-size: 15px; font-weight: 650; border: 0; border-radius: 12px;
-    background: var(--brand); color: #fff; cursor: pointer;
+    padding: 0 24px; border: 0; border-radius: 16px; cursor: pointer; color: #fff;
+    font: 600 15px "Space Grotesk", Inter, sans-serif; letter-spacing: .01em;
+    background: linear-gradient(135deg, var(--primary-light), var(--primary));
+    box-shadow: var(--glow);
+    transition: transform .18s cubic-bezier(.2,.8,.2,1), filter .18s;
   }
-  button:disabled { opacity: .55; cursor: default; }
-  .dots span {
-    display: inline-block; width: 7px; height: 7px; margin-right: 4px; border-radius: 50%;
-    background: var(--muted); animation: b 1.2s infinite;
+  button:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.08); }
+  button:disabled { opacity: .5; cursor: default; box-shadow: none; }
+
+  /* Scanning line while it thinks — it is usually calling two or three tools, and a static
+     spinner makes that feel like a hang rather than work happening. */
+  .thinking { display: flex; align-items: center; gap: 11px; color: var(--text-2); font-size: 14px; }
+  .scan { position: relative; width: 74px; height: 3px; border-radius: 3px; background: var(--line); overflow: hidden; }
+  .scan::after {
+    content: ""; position: absolute; inset: 0; width: 42%; border-radius: 3px;
+    background: linear-gradient(90deg, transparent, var(--primary), var(--warm), transparent);
+    animation: sweep 1.25s cubic-bezier(.4,0,.6,1) infinite;
   }
-  .dots span:nth-child(2) { animation-delay: .18s } .dots span:nth-child(3) { animation-delay: .36s }
-  @keyframes b { 0%,60%,100% { opacity:.25; transform: translateY(0) } 30% { opacity:1; transform: translateY(-3px) } }
+  @keyframes sweep { from { transform: translateX(-110%) } to { transform: translateX(260%) } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .aurora i, .orb, .scan::after, .msg { animation: none !important; }
+    .chip, button, input { transition: none; }
+  }
 </style>
 </head>
 <body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
 <header>
-  <div class="mark">🌋</div>
+  <div class="orb">🌋</div>
   <div>
-    <h1>Tenerife AI</h1>
-    <p>Ask about events, venues and things to do</p>
+    <h1>Tenerinfo AI</h1>
+    <p>Events, venues, buses, weather — live</p>
   </div>
 </header>
 
 <main>
   <div class="intro" id="intro">
-    Answers come only from TenerInfo's own events, venues and tours, plus a Tenerife travel guide.
-    If the sources don't cover it, it will say so rather than guess.
+    Ask anything about Tenerife. Answers come from <b>TenerInfo's own events and venues</b>,
+    plus live weather, sea, bus times, pharmacies and fuel prices — and it says so when it
+    doesn't know.
   </div>
   <div class="chips" id="chips"></div>
   <div id="thread"></div>
+
   <form id="form" autocomplete="off">
-    <input id="q" placeholder="e.g. where can I watch football tonight?" required>
+    <div class="field"><input id="q" placeholder="e.g. where can I watch football tonight?" required></div>
     <button id="send">Ask</button>
   </form>
 </main>
 
 <script>
 const thread = document.getElementById('thread');
-const form = document.getElementById('form');
-const input = document.getElementById('q');
-const send = document.getElementById('send');
-const intro = document.getElementById('intro');
+const form   = document.getElementById('form');
+const input  = document.getElementById('q');
+const send   = document.getElementById('send');
+const intro  = document.getElementById('intro');
+const chips  = document.getElementById('chips');
 
 // The conversation so far, so a follow-up like "near Los Cristianos" still knows it is about
 // football. Kept here rather than on the server: the thread is already on screen, and this
 // way there are no sessions to expire and nothing to lose when the server restarts.
 const history = [];
 
+// The app's own category colours (src/constants/colors.ts), so a source badge here is the
+// same colour the same thing wears in the app.
+const TAG_COLOR = {
+  event: '#8B5CF6', place: '#3B82F6', tour: '#06B6D4', guide: '#F59E00',
+};
+
 const EXAMPLES = [
   'What live music is on in Los Cristianos?',
   'Where can I watch football tonight?',
-  'Somewhere to take the kids to swim',
-  'Good tapas in Costa Adeje',
+  'Bus from Playa de las Américas to the airport',
+  'Is tonight good for stargazing?',
 ];
-const chips = document.getElementById('chips');
 EXAMPLES.forEach(text => {
   const b = document.createElement('button');
   b.type = 'button'; b.className = 'chip'; b.textContent = text;
@@ -156,14 +253,16 @@ function renderSources(list) {
     const row = document.createElement('div');
     row.className = 'src';
     const tag = document.createElement('span');
-    tag.className = 'tag' + (s.type === 'guide' ? ' guide' : '');
+    tag.className = 'tag';
+    tag.style.setProperty('--tag', TAG_COLOR[s.type] || '#78716C');
     tag.textContent = s.type;
-    const title = document.createElement('span');
-    title.textContent = s.title;
+    const what = document.createElement('span');
+    what.className = 'what';
+    what.textContent = s.title;
     const score = document.createElement('span');
     score.className = 'score';
     score.textContent = s.score;
-    row.append(tag, title, score);
+    row.append(tag, what, score);
     wrap.append(row);
   }
   return wrap;
@@ -178,10 +277,10 @@ form.onsubmit = async (e) => {
   send.disabled = true;
   bubble('me', document.createTextNode(question));
 
-  const dots = document.createElement('span');
-  dots.className = 'dots';
-  dots.innerHTML = '<span></span><span></span><span></span>';
-  const pending = bubble('ai', dots);
+  const waiting = document.createElement('div');
+  waiting.className = 'thinking';
+  waiting.innerHTML = '<span class="scan"></span><span>searching…</span>';
+  const pending = bubble('ai', waiting);
 
   try {
     const res = await fetch('/ask', {
