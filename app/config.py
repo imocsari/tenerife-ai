@@ -30,7 +30,12 @@ EMBED_MODEL = "intfloat/multilingual-e5-small"
 EMBED_DIM = 384          # must match EMBED_MODEL; used for the pgvector column
 
 # --- LLM --------------------------------------------------------------------
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "ollama")  # "ollama" or "claude"
+# Defaults to claude, not ollama (2026-10-15). The old default meant any deployment that
+# forgot the variable tried to reach a local Ollama that is not in the container, failed, and
+# answered every single question with the "could not reach the service" fallback — a silent
+# misconfiguration dressed up as a transient outage. Claude needs a key, so getting it wrong
+# now fails loudly at the first request instead.
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "claude")  # "claude" or "ollama"
 # qwen2.5:7b, not llama3.2 (2026-10-14): tool calling is the job now, and llama3.2 at 3B
 # cannot do it — it answered "I don't know" to questions whose data was in front of it, and
 # described tool calls in prose instead of making them. 7B is the realistic floor here, and
