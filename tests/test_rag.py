@@ -102,3 +102,60 @@ def test_every_tool_is_offered_to_both_providers():
     ollama = {t["function"]["name"] for t in tools.ollama_schemas()}
 
     assert claude == ollama == set(tools.REGISTRY)
+
+
+# --- TITSA buses -----------------------------------------------------------------------
+# The after-midnight rules are the easy thing to get wrong and the hard thing to notice:
+# a bug here silently hides the last buses of the night rather than raising anything.
+
+def test_after_midnight_times_display_as_real_clock_times():
+    """GTFS writes a 00:40 bus as 24:40. Showing that to a user would be nonsense."""
+    from app.tools.buses import _fmt
+
+    assert _fmt(24 * 3600 + 40 * 60, "24:40:00") == "00:40 (after midnight)"
+    assert _fmt(23 * 3600 + 15 * 60, "23:15:00") == "23:15"
+
+
+def test_small_hours_still_count_as_last_nights_service_day(monkeypatch):
+    """At 01:30 the buses still running are yesterday's service, listed at 25:30. Treating it
+    as a new day would report 'no more buses' while they were still running."""
+    import datetime as real_datetime
+    from app.tools import buses
+
+    class FakeDateTime(real_datetime.datetime):
+        @classmethod
+        def now(cls):
+            return cls(2026, 10, 15, 1, 30)
+
+    monkeypatch.setattr(buses, "datetime", FakeDateTime)
+
+    seconds, service_date = buses._now_seconds_and_date()
+
+    assert seconds == 25 * 3600 + 30 * 60          # offset past 24:00, not 1.5h
+    assert service_date == real_datetime.date(2026, 10, 14)   # yesterday's service day
+
+
+def test_daytime_uses_today_and_plain_seconds(monkeypatch):
+    import datetime as real_datetime
+    from app.tools import buses
+
+    class FakeDateTime(real_datetime.datetime):
+        @classmethod
+        def now(cls):
+            return cls(2026, 10, 15, 14, 5)
+
+    monkeypatch.setattr(buses, "datetime", FakeDateTime)
+
+    seconds, service_date = buses._now_seconds_and_date()
+
+    assert seconds == 14 * 3600 + 5 * 60
+    assert service_date == real_datetime.date(2026, 10, 15)
+
+
+def test_gtfs_times_past_midnight_parse_rather_than_fail():
+    """33,623 rows in the real feed are at hour 24-30; a time parser would reject them."""
+    from ingest.sync_titsa import seconds
+
+    assert seconds("25:30:00") == 91800
+    assert seconds("30:00:00") == 108000
+    assert seconds("") is None
