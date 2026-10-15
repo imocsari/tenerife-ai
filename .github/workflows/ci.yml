@@ -48,4 +48,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build the image
-        run: docker build -t tenerife-ai:ci .
+        run: docker build -f Dockerfile.vercel -t tenerife-ai:ci .

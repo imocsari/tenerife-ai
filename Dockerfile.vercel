@@ -1,5 +1,10 @@
 # Tenerife AI — API image.
 #
+# Named Dockerfile.vercel because Vercel detects that name automatically and routes all traffic
+# to the image. It is an ordinary OCI image otherwise: anywhere else, build it with
+#   docker build -f Dockerfile.vercel -t tenerife-ai .
+# There is deliberately only one Dockerfile — two that differ by a port default would drift.
+#
 # Two things dominate the size and the cold start, and both are handled here rather than at
 # runtime: torch, which pulls a multi-gigabyte CUDA build by default when the CPU wheel is a
 # fraction of that and this never sees a GPU; and the embedding model, which is downloaded at
@@ -41,14 +46,17 @@ RUN python -c "from sentence_transformers import SentenceTransformer; \
 RUN useradd --create-home --uid 10001 appuser
 USER appuser
 
-EXPOSE 8000
+EXPOSE 80
 
 # The container is only healthy once it can actually answer, not merely once the port is open.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
-    CMD python -c "import urllib.request,sys; \
-    sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status==200 else 1)"
+    CMD python -c "import os,urllib.request,sys; \
+    sys.exit(0 if urllib.request.urlopen(f\"http://127.0.0.1:{os.getenv('PORT','80')}/health\", timeout=4).status==200 else 1)"
 
 # One worker by default: each loads its own copy of the embedding model, so workers cost
 # memory rather than being free. Raise WEB_CONCURRENCY only with the RAM to back it.
+# Vercel routes to port 80 unless PORT says otherwise. One worker: each loads its own copy of
+# the embedding model, so a second worker doubles memory rather than being free — and the
+# Hobby instance is a fixed 2GB.
 ENV WEB_CONCURRENCY=1
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WEB_CONCURRENCY}"]
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-80} --workers ${WEB_CONCURRENCY}"]
