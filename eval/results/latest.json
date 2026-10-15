@@ -1,0 +1,314 @@
+{
+  "timestamp": "2026-10-15T09:38:10",
+  "note": "",
+  "summary": {
+    "ALL": {
+      "questions": 14,
+      "hit_rate": 0.909,
+      "mrr": 0.864,
+      "avg_seconds": 1.435
+    },
+    "transport": {
+      "questions": 4,
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "avg_seconds": 2.96
+    },
+    "en": {
+      "questions": 12,
+      "hit_rate": 0.889,
+      "mrr": 0.833,
+      "avg_seconds": 1.541
+    },
+    "beach": {
+      "questions": 3,
+      "hit_rate": 1.0,
+      "mrr": 0.833,
+      "avg_seconds": 0.837
+    },
+    "sights": {
+      "questions": 3,
+      "hit_rate": 0.667,
+      "mrr": 0.667,
+      "avg_seconds": 0.823
+    },
+    "food": {
+      "questions": 1,
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "avg_seconds": 0.79
+    },
+    "es": {
+      "questions": 2,
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "avg_seconds": 0.8
+    },
+    "refusal": {
+      "questions": 3,
+      "avg_seconds": 0.827
+    }
+  },
+  "results": [
+    {
+      "id": "transport-01",
+      "tags": [
+        "transport",
+        "en"
+      ],
+      "question": "How can I get to Teide National Park?",
+      "retrieved": [
+        "Teide National Park – Introduction",
+        "Teide National Park – Pico del Teide",
+        "Tenerife – Nature",
+        "Teide National Park – Understand",
+        "Teide National Park – Fees and permits",
+        "3h Teide National Park Buggy Tour"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 9.06
+    },
+    {
+      "id": "transport-02",
+      "tags": [
+        "transport",
+        "en"
+      ],
+      "question": "Can I take a ferry to La Gomera from the south of the island?",
+      "retrieved": [
+        "From South Tenerife: La Gomera Island Day Trip with Lunch",
+        "Tenerife – Go next",
+        "La Gomera Island Day Trip with Village Lunch",
+        "Los Cristianos – By boat",
+        "La Gomera from Tenerife : small group max. 18 people",
+        "Santa Cruz de Tenerife – By boat"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 1.19
+    },
+    {
+      "id": "transport-03",
+      "tags": [
+        "transport",
+        "en"
+      ],
+      "question": "How do I get from the airport to the south of the island?",
+      "retrieved": [
+        "Tenerife – By plane",
+        "Los Cristianos – By car",
+        "Airport Transfer to Playa de las Américas",
+        "Puerto de la Cruz – By plane",
+        "Puerto de la Cruz – By car",
+        "Santa Cruz de Tenerife – By plane"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.79
+    },
+    {
+      "id": "beach-01",
+      "tags": [
+        "beach",
+        "en"
+      ],
+      "question": "Where can I take the kids to swim near Los Cristianos?",
+      "retrieved": [
+        "Los Cristianos – Introduction",
+        "Aqua-Marina Diving",
+        "Diving Atlantis",
+        "Xplore Tenerife Kayaking",
+        "Big Fish Tenerife",
+        "Los Cristianos – Do"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.85
+    },
+    {
+      "id": "beach-02",
+      "tags": [
+        "beach",
+        "en"
+      ],
+      "question": "Is there a beach in Santa Cruz?",
+      "retrieved": [
+        "Andana Beach Club",
+        "Santa Cruz de Tenerife – Do",
+        "Tropicalia",
+        "Santa Cruz de Tenerife – Parks",
+        "Puerto de la Cruz – Introduction",
+        "Santa Cruz de Tenerife – Understand"
+      ],
+      "hit": true,
+      "reciprocal_rank": 0.5,
+      "seconds": 0.86
+    },
+    {
+      "id": "sights-01",
+      "tags": [
+        "sights",
+        "en"
+      ],
+      "question": "What is there to see in La Laguna?",
+      "retrieved": [
+        "Tenerife – Other water activities and tours",
+        "Tenerife – Culture",
+        "Tenerife – Other water activities and tours",
+        "La Rana",
+        "Tenerife – Culture",
+        "Tenerife – Culture"
+      ],
+      "hit": false,
+      "reciprocal_rank": 0.0,
+      "seconds": 0.82
+    },
+    {
+      "id": "sights-02",
+      "tags": [
+        "sights",
+        "en"
+      ],
+      "question": "Is it cold at the top of the volcano?",
+      "retrieved": [
+        "Teide National Park – Climate",
+        "Tenerife – Diving",
+        "Teide National Park – Stay safe",
+        "Santa Cruz de Tenerife – Climate",
+        "Teide National Park – Hiking",
+        "Secret Volcano Tuk Tuk Tour: Tenerife & Adeje"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.83
+    },
+    {
+      "id": "sights-03",
+      "tags": [
+        "sights",
+        "en"
+      ],
+      "question": "What can I do in Puerto de la Cruz on a rainy day?",
+      "retrieved": [
+        "Puerto de la Cruz – Introduction",
+        "Puerto de la Cruz – Stay safe",
+        "Puerto de la Cruz – By car",
+        "Puerto de la Cruz – Do",
+        "Santa Cruz de Tenerife – Climate",
+        "Carnaval de Día — First Day Carnival"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.82
+    },
+    {
+      "id": "food-01",
+      "tags": [
+        "food",
+        "en"
+      ],
+      "question": "What local food should I try in Tenerife?",
+      "retrieved": [
+        "Tenerife – Eat",
+        "Tenerife – Eat",
+        "Santa Cruz de Tenerife – Eat",
+        "Tenerife – Drink",
+        "Tenerife – Other water activities and tours",
+        "Restaurante la Bodeguita"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.79
+    },
+    {
+      "id": "es-01",
+      "tags": [
+        "transport",
+        "es"
+      ],
+      "question": "¿Cómo puedo llegar al Teide?",
+      "retrieved": [
+        "Teide National Park – Introduction",
+        "Teide Cable Car — Return Ticket",
+        "Teide National Park – Understand",
+        "Teide Adventure Buggy Tour (3.5h)",
+        "Tenerife – Nature",
+        "Teide National Park – Camping"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.8
+    },
+    {
+      "id": "es-02",
+      "tags": [
+        "beach",
+        "es"
+      ],
+      "question": "¿Dónde hay una playa tranquila para niños cerca de Los Cristianos?",
+      "retrieved": [
+        "Los Cristianos – Introduction",
+        "Los Tarajales",
+        "Playa Sol",
+        "La Rana",
+        "Paradise Park Hotel",
+        "Waikiki Beach Fun Pub"
+      ],
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.8
+    },
+    {
+      "id": "refuse-01",
+      "tags": [
+        "refusal",
+        "en"
+      ],
+      "question": "What is the best pizza place in Madrid?",
+      "retrieved": [
+        "AB Origini",
+        "Pizzeria El Pueblo",
+        "500 Gradi",
+        "Pizza y Pasta",
+        "Pizzeria Regina Margherita (Adeje)",
+        "Santa Cruz de Tenerife – Budget"
+      ],
+      "seconds": 0.87
+    },
+    {
+      "id": "refuse-02",
+      "tags": [
+        "refusal",
+        "en"
+      ],
+      "question": "Can you recommend a hotel in Paris?",
+      "retrieved": [
+        "Tenerife – Hotels",
+        "Santa Cruz de Tenerife – Sleep",
+        "Puerto de la Cruz – Sleep",
+        "Puerto de la Cruz – Mid-range",
+        "Puerto de la Cruz – Splurge",
+        "Paradise Park Hotel"
+      ],
+      "seconds": 0.81
+    },
+    {
+      "id": "refuse-03",
+      "tags": [
+        "refusal",
+        "en"
+      ],
+      "question": "What is the capital of Australia?",
+      "retrieved": [
+        "Santa Cruz de Tenerife – Introduction",
+        "Santa Cruz de Tenerife – See",
+        "Tenerife – Understand",
+        "Tenerife – Metropolitan region",
+        "Tenerife – Regions",
+        "Kev’s Chillout Bar"
+      ],
+      "seconds": 0.8
+    }
+  ]
+}

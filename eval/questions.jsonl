@@ -1,0 +1,14 @@
+{"id": "transport-01", "tags": ["transport", "en"], "question": "How can I get to Teide National Park?", "expected_sources": ["Teide"], "must_contain": []}
+{"id": "transport-02", "tags": ["transport", "en"], "question": "Can I take a ferry to La Gomera from the south of the island?", "expected_sources": ["Los Cristianos", "Tenerife"], "must_contain": ["ferr"]}
+{"id": "transport-03", "tags": ["transport", "en"], "question": "How do I get from the airport to the south of the island?", "expected_sources": ["Tenerife", "Los Cristianos"], "must_contain": []}
+{"id": "beach-01", "tags": ["beach", "en"], "question": "Where can I take the kids to swim near Los Cristianos?", "expected_sources": ["Los Cristianos"], "must_contain": ["beach", "playa"]}
+{"id": "beach-02", "tags": ["beach", "en"], "question": "Is there a beach in Santa Cruz?", "expected_sources": ["Santa Cruz"], "must_contain": ["beach", "playa"]}
+{"id": "sights-01", "tags": ["sights", "en"], "question": "What is there to see in La Laguna?", "expected_sources": ["La Laguna"], "must_contain": []}
+{"id": "sights-02", "tags": ["sights", "en"], "question": "Is it cold at the top of the volcano?", "expected_sources": ["Teide"], "must_contain": []}
+{"id": "sights-03", "tags": ["sights", "en"], "question": "What can I do in Puerto de la Cruz on a rainy day?", "expected_sources": ["Puerto de la Cruz"], "must_contain": []}
+{"id": "food-01", "tags": ["food", "en"], "question": "What local food should I try in Tenerife?", "expected_sources": ["Tenerife"], "must_contain": []}
+{"id": "es-01", "tags": ["transport", "es"], "question": "¿Cómo puedo llegar al Teide?", "expected_sources": ["Teide"], "must_contain": []}
+{"id": "es-02", "tags": ["beach", "es"], "question": "¿Dónde hay una playa tranquila para niños cerca de Los Cristianos?", "expected_sources": ["Los Cristianos"], "must_contain": []}
+{"id": "refuse-01", "tags": ["refusal", "en"], "question": "What is the best pizza place in Madrid?", "expected_sources": [], "should_refuse": true}
+{"id": "refuse-02", "tags": ["refusal", "en"], "question": "Can you recommend a hotel in Paris?", "expected_sources": [], "should_refuse": true}
+{"id": "refuse-03", "tags": ["refusal", "en"], "question": "What is the capital of Australia?", "expected_sources": [], "should_refuse": true}
