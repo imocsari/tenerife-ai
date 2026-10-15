@@ -159,3 +159,29 @@ def test_gtfs_times_past_midnight_parse_rather_than_fail():
     assert seconds("25:30:00") == 91800
     assert seconds("30:00:00") == 108000
     assert seconds("") is None
+
+
+# --- moon phase ------------------------------------------------------------------------
+# Arithmetic rather than an API call, so it is worth asserting it actually tracks the moon.
+
+def test_moon_phase_tracks_the_lunar_cycle():
+    from datetime import datetime, timezone
+    from app.tools.stargazing import moon_phase
+
+    new_fraction, new_name = moon_phase(datetime(2026, 10, 11, tzinfo=timezone.utc))
+    full_fraction, full_name = moon_phase(datetime(2026, 10, 26, tzinfo=timezone.utc))
+
+    assert new_name == "new moon" and new_fraction < 0.05
+    assert full_name == "full moon" and full_fraction > 0.95
+
+
+def test_moon_phase_is_cyclic():
+    """A synodic month later, the moon is where it started — catches drift in the arithmetic."""
+    from datetime import datetime, timedelta, timezone
+    from app.tools.stargazing import moon_phase
+
+    start = datetime(2026, 6, 1, tzinfo=timezone.utc)
+    a, _ = moon_phase(start)
+    b, _ = moon_phase(start + timedelta(days=29.530588853))
+
+    assert abs(a - b) < 0.01
