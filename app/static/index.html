@@ -47,8 +47,11 @@
 
   /* Slow aurora in the brand blue and the app's amber. Sits behind everything, never moves
      with the content, and stops entirely for anyone who asked for less motion. */
-  .aurora { position: fixed; inset: -30% -10% auto -10%; height: 70vh; z-index: 0; pointer-events: none;
-            filter: blur(70px); opacity: .5; }
+  .aurora { position: fixed; inset: -30% -10% auto -10%; height: 58vh; z-index: 0; pointer-events: none;
+            filter: blur(70px); opacity: .42;
+            /* Faded out before it reaches the input, so nothing drifts behind the typing area. */
+            -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent);
+            mask-image: linear-gradient(to bottom, #000 45%, transparent); }
   .aurora i { position: absolute; display: block; border-radius: 50%; mix-blend-mode: multiply; }
   @media (prefers-color-scheme: dark) { .aurora i { mix-blend-mode: screen; } .aurora { opacity: .4 } }
   .aurora i:nth-child(1) { width: 52vw; height: 52vw; left: -6vw;  top: 2vh;  background: var(--primary-light); animation: drift 24s ease-in-out infinite; }
@@ -137,16 +140,26 @@
   form {
     position: sticky; bottom: 0; z-index: 2; display: flex; gap: 10px;
     padding: 14px 0 max(16px, env(safe-area-inset-bottom));
-    background: linear-gradient(to top, var(--bg) 62%, transparent);
+    /* Solid, not a gradient scrim. Fading translucent white over a drifting aurora read as
+       haze sitting on the one control people actually use. */
+    background: var(--bg);
+  }
+  form::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -22px; height: 22px;
+    background: linear-gradient(to top, var(--bg), transparent); pointer-events: none;
   }
   .field { position: relative; flex: 1; }
   input {
     width: 100%; padding: 15px 17px; font: 400 16px Inter, sans-serif;
-    color: var(--text); background: var(--glass); border: 1px solid var(--line);
-    border-radius: 16px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    color: var(--text); background: var(--card); border: 1.5px solid var(--line);
+    border-radius: 16px; box-shadow: var(--shadow);
     transition: border-color .2s, box-shadow .2s;
   }
-  input:focus { outline: none; border-color: var(--primary); box-shadow: var(--glow); }
+  input::placeholder { color: var(--text-2); opacity: .85; }
+  input:focus {
+    outline: none; border-color: var(--primary);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent), var(--shadow);
+  }
   button {
     padding: 0 24px; border: 0; border-radius: 16px; cursor: pointer; color: #fff;
     font: 600 15px "Space Grotesk", Inter, sans-serif; letter-spacing: .01em;
