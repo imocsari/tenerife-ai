@@ -4,7 +4,7 @@
 # so the schema is written once here and translated, rather than maintained twice.
 
 from app.tools import (air_quality, buses, currency, fuel, geocode, health, holidays,
-                       knowledge, marine, stargazing, weather, wiki)
+                       knowledge, marine, places_nearby, stargazing, weather, wiki)
 
 # name -> {"description", "parameters" (JSON Schema), "run" (callable)}
 REGISTRY = {
@@ -18,6 +18,7 @@ REGISTRY = {
     **currency.TOOLS,
     **fuel.TOOLS,
     **health.TOOLS,
+    **places_nearby.TOOLS,
     **stargazing.TOOLS,
     **wiki.TOOLS,
 }
