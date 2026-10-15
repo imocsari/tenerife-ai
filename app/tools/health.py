@@ -7,10 +7,8 @@
 # opening hours are not in the register, and on an island where much of it shuts for siesta,
 # "ring first" is the honest advice.
 
-import psycopg
-from psycopg.rows import dict_row
-
 from app import config
+from app.db import connection
 from app.tools._located import LOCATION_PARAMS, resolve
 
 # What people ask for -> what the register calls it.
@@ -37,7 +35,7 @@ def find_health_service(place=None, latitude=None, longitude=None, kind="pharmac
     import math
     mlon = _M_PER_DEG_LAT * math.cos(math.radians(lat))
 
-    with psycopg.connect(config.DATABASE_URL, row_factory=dict_row) as conn:
+    with connection() as conn:
         rows = conn.execute(
             """SELECT name, address, municipality, phone, website,
                       sqrt(((latitude - %(lat)s) * %(mlat)s) ^ 2 +

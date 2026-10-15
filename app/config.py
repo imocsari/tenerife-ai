@@ -41,6 +41,13 @@ OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
 CLAUDE_MODEL = os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
 MAX_TOKENS = 600
 
+# A tool-using turn makes several round trips; this bounds the whole thing.
+LLM_TIMEOUT_SECONDS = float(os.getenv("LLM_TIMEOUT_SECONDS", "90"))
+
+# How long a weather or sea answer stays good enough to reuse. Forecasts update hourly at
+# best, so re-fetching per question buys nothing and just adds latency and load on a free API.
+API_CACHE_SECONDS = int(os.getenv("API_CACHE_SECONDS", "1800"))
+
 # --- Database ---------------------------------------------------------------
 DATABASE_URL = os.getenv("DATABASE_URL")
 

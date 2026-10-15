@@ -10,10 +10,8 @@
 
 import math
 
-import psycopg
-from psycopg.rows import dict_row
-
 from app import config
+from app.db import connection
 from app.tools._located import LOCATION_PARAMS, resolve
 
 _M_PER_DEG_LAT = 111_320
@@ -60,7 +58,7 @@ def find_places_nearby(what, place=None, latitude=None, longitude=None, limit=6)
     categories = _categories_for(what)
     mlon = _M_PER_DEG_LAT * math.cos(math.radians(lat))
 
-    with psycopg.connect(config.DATABASE_URL, row_factory=dict_row) as conn:
+    with connection() as conn:
         rows = conn.execute(
             """SELECT name, category, locality, address, phone, website,
                       sqrt(((latitude - %(lat)s) * %(mlat)s) ^ 2 +

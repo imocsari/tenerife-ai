@@ -7,6 +7,8 @@
 
 import requests
 
+from app.tools._cache import cached
+
 FORECAST = "https://api.open-meteo.com/v1/forecast"
 
 # Open-Meteo returns WMO weather codes; these are the ones the Canaries actually produce.
@@ -21,6 +23,7 @@ WMO = {
 }
 
 
+@cached()
 def get_weather(place=None, latitude=None, longitude=None, days=3):
     """Current weather and a short daily forecast for one point in Tenerife.
 
@@ -79,6 +82,7 @@ def get_weather(place=None, latitude=None, longitude=None, days=3):
     return "\n".join(lines)
 
 
+@cached()
 def get_sun_times(place=None, latitude=None, longitude=None, days=1):
     """Sunrise and sunset for a place in Tenerife.
 

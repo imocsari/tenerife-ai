@@ -6,11 +6,14 @@
 
 import requests
 
+from app.tools._cache import cached
+
 from app.tools._located import LOCATION_PARAMS, resolve
 
 MARINE = "https://marine-api.open-meteo.com/v1/marine"
 
 
+@cached()
 def get_sea_conditions(place=None, latitude=None, longitude=None, days=2):
     """Wave height, wave period and sea temperature for a coastal point in Tenerife."""
     lat, lon, where = resolve(place, latitude, longitude)
@@ -54,6 +57,7 @@ def get_sea_conditions(place=None, latitude=None, longitude=None, days=2):
     return "\n".join(lines)
 
 
+@cached()
 def get_tides(place=None, latitude=None, longitude=None):
     """Today's high and low water for a coastal point in Tenerife.
 

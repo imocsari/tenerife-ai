@@ -8,6 +8,8 @@
 
 import requests
 
+from app.tools._cache import cached
+
 from app.tools._located import LOCATION_PARAMS, resolve
 
 AIR = "https://air-quality-api.open-meteo.com/v1/air-quality"
@@ -23,6 +25,7 @@ def _band(aqi):
     return "extremely poor"
 
 
+@cached()
 def get_air_quality(place=None, latitude=None, longitude=None):
     """Current air quality, including Saharan dust (calima), for a point in Tenerife."""
     lat, lon, where = resolve(place, latitude, longitude)

@@ -71,7 +71,9 @@ def _claude_tools(system, question, history=None):
     from anthropic import Anthropic
     from app import tools
 
-    client = Anthropic()
+    # A question here fires several tool calls, so the whole turn can take a while — but not
+    # forever. Beyond this the user has given up anyway, and an open socket is just cost.
+    client = Anthropic(timeout=config.LLM_TIMEOUT_SECONDS, max_retries=2)
     messages = _as_turns(history) + [{"role": "user", "content": question}]
 
     for _ in range(MAX_TOOL_ROUNDS):
@@ -141,10 +143,23 @@ def _ollama_tools(system, question, history=None):
 TOOL_PROVIDERS = {"claude": _claude_tools, "ollama": _ollama_tools}
 
 
+# What the user sees when the model itself is unreachable. Deliberately not an apology with a
+# stack trace: it says what happened, that it is not their fault, and what to do.
+LLM_UNAVAILABLE = (
+    "I could not reach the service that writes the answers just now. The events, bus times and "
+    "weather are all still there — please try again in a moment."
+)
+
+
 def generate_with_tools(system, question, history=None):
     """Answer a question in the context of the conversation so far, calling tools as needed."""
     try:
         provider = TOOL_PROVIDERS[config.LLM_PROVIDER]
     except KeyError:
         raise ValueError(f"Unknown LLM_PROVIDER: {config.LLM_PROVIDER!r}")
-    return provider(system, question, history)
+    try:
+        return provider(system, question, history)
+    except Exception as e:
+        # One unreachable provider must not surface as a 500 to someone asking about dinner.
+        print(f"[llm] {config.LLM_PROVIDER} failed: {type(e).__name__}: {e}", flush=True)
+        return LLM_UNAVAILABLE

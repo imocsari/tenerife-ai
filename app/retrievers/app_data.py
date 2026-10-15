@@ -2,8 +2,7 @@
 # Searches your app's events, places and tours (ai_documents table in Supabase),
 # combining exact filters (area, dates, type) with meaning search (pgvector).
 
-import psycopg
-from psycopg.rows import dict_row
+from app.db import connection
 
 from app import config
 from app.embeddings import to_pgvector
@@ -40,7 +39,7 @@ def search(query_vector, top_k=5, area=None, date_from=None, date_to=None, sourc
         LIMIT %s
     """
     # Note: one connection per search is fine for now; use a connection pool in production.
-    with psycopg.connect(config.DATABASE_URL, row_factory=dict_row) as conn:
+    with connection() as conn:
         rows = conn.execute(sql, [vector, *params, vector, top_k]).fetchall()
 
     return [{

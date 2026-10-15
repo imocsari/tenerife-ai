@@ -13,6 +13,8 @@ from datetime import date, datetime, timezone
 
 import requests
 
+from app.tools._cache import cached
+
 from app.tools._located import LOCATION_PARAMS, resolve
 
 FORECAST = "https://api.open-meteo.com/v1/forecast"
@@ -42,6 +44,7 @@ def moon_phase(when=None):
     return fraction, next(n for limit, n in names if age < limit)
 
 
+@cached()
 def get_stargazing_conditions(place=None, latitude=None, longitude=None):
     """Cloud, moonlight and darkness tonight — by default up at Las Cañadas."""
     if place or (latitude is not None and longitude is not None):

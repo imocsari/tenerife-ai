@@ -26,7 +26,9 @@ def _now_seconds_and_date():
 
 
 def _connect():
-    return psycopg.connect(config.DATABASE_URL, row_factory=dict_row)
+    """Borrows from the shared pool — see app/db.py."""
+    from app.db import connection
+    return connection()
 
 
 # How far from a place a bus stop can be and still count as serving it. 1km is about a

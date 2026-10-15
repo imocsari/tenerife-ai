@@ -10,6 +10,8 @@ import math
 
 import requests
 
+from app.tools._cache import cached
+
 from app.tools._located import LOCATION_PARAMS, resolve
 
 # 38 is the province code for Santa Cruz de Tenerife, which covers the whole island.
@@ -32,6 +34,7 @@ def _spanish_float(text):
         return None
 
 
+@cached()
 def get_fuel_prices(place=None, latitude=None, longitude=None, fuel="petrol", limit=5):
     """Cheapest filling stations near a place in Tenerife."""
     lat, lon, where = resolve(place, latitude, longitude)

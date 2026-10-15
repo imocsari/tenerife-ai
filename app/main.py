@@ -4,6 +4,7 @@
 
 import os
 import time
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Header, HTTPException, Request
@@ -16,7 +17,22 @@ from app import rag
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 
-app = FastAPI(title="Tenerife AI")
+@asynccontextmanager
+async def lifespan(_app):
+    """Warm the slow things before the first question rather than during it: the embedding
+    model takes seconds to load, and whoever asked first was paying for it."""
+    try:
+        from app.embeddings import embed
+        embed("warm up")
+        from app.db import pool
+        pool()
+        print("[startup] embedding model and database pool ready", flush=True)
+    except Exception as e:                       # never block serving on a warm-up failure
+        print(f"[startup] warm-up skipped: {type(e).__name__}: {e}", flush=True)
+    yield
+
+
+app = FastAPI(title="Tenerife AI", lifespan=lifespan)
 
 # Who may call this from a browser. Defaults to local development; set ALLOWED_ORIGINS in the
 # environment for production, e.g. "https://tenerinfo.app,https://www.tenerinfo.app".
