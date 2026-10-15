@@ -116,6 +116,11 @@ const input = document.getElementById('q');
 const send = document.getElementById('send');
 const intro = document.getElementById('intro');
 
+// The conversation so far, so a follow-up like "near Los Cristianos" still knows it is about
+// football. Kept here rather than on the server: the thread is already on screen, and this
+// way there are no sessions to expire and nothing to lose when the server restarts.
+const history = [];
+
 const EXAMPLES = [
   'What live music is on in Los Cristianos?',
   'Where can I watch football tonight?',
@@ -182,11 +187,13 @@ form.onsubmit = async (e) => {
     const res = await fetch('/ask', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, history }),
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     pending.textContent = data.answer;
+    history.push({ role: 'user', content: question },
+                 { role: 'assistant', content: data.answer });
     const srcs = renderSources(data.sources);
     if (srcs) pending.append(srcs);
   } catch (err) {

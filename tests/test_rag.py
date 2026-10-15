@@ -45,7 +45,7 @@ def test_ask_reports_the_sources_the_search_tool_actually_used(monkeypatch):
 
     monkeypatch.setattr(rag, "retrieve", lambda q, top_k=6: [source("Beach", 0.9)])
 
-    def fake_model(system, question):
+    def fake_model(system, question, history=None):
         knowledge.search_tenerinfo("where to swim")      # the model reaching for the tool
         return "Try Playa de las Vistas."
 
@@ -59,7 +59,8 @@ def test_ask_reports_the_sources_the_search_tool_actually_used(monkeypatch):
 
 def test_ask_reports_no_sources_when_no_search_happened(monkeypatch):
     """A weather-only question searches nothing, and must not claim sources it never read."""
-    monkeypatch.setattr(rag.llm, "generate_with_tools", lambda s, q: "It is 24C and overcast.")
+    monkeypatch.setattr(rag.llm, "generate_with_tools",
+                        lambda s, q, h=None: "It is 24C and overcast.")
 
     assert rag.ask("Weather in Los Gigantes?")["sources"] == []
 
@@ -72,7 +73,7 @@ def test_ask_deduplicates_a_source_found_by_two_searches(monkeypatch):
     scores = iter([0.6, 0.9])
     monkeypatch.setattr(rag, "retrieve", lambda q, top_k=6: [source("Beach", next(scores))])
 
-    def fake_model(system, question):
+    def fake_model(system, question, history=None):
         knowledge.search_tenerinfo("swim")
         knowledge.search_tenerinfo("beach")
         return "Playa de las Vistas."
@@ -185,3 +186,40 @@ def test_moon_phase_is_cyclic():
     b, _ = moon_phase(start + timedelta(days=29.530588853))
 
     assert abs(a - b) < 0.01
+
+
+# --- conversation memory ---------------------------------------------------------------
+# A follow-up like "near Los Cristianos" is meaningless without the question before it.
+
+def test_history_is_passed_to_the_model(monkeypatch):
+    seen = {}
+
+    def fake(system, question, history=None):
+        seen["question"], seen["history"] = question, history
+        return "ok"
+
+    monkeypatch.setattr(rag.llm, "generate_with_tools", fake)
+    rag.ask("near los cristianos",
+            [{"role": "user", "content": "where can I watch football tonight?"},
+             {"role": "assistant", "content": "At Scallywags in Costa Adeje."}])
+
+    assert seen["question"] == "near los cristianos"
+    assert [h["role"] for h in seen["history"]] == ["user", "assistant"]
+
+
+def test_history_keeps_only_clean_recent_turns():
+    """Tool calls and blanks are dropped, and the window is capped — replaying tool results
+    would be large, redundant, and would nudge the model to repeat calls it already made."""
+    from app.llm import _as_turns, MAX_HISTORY_TURNS
+
+    messy = ([{"role": "user", "content": "a"}, {"role": "tool", "content": "huge tool output"},
+              {"role": "assistant", "content": ""}] * 10)
+    turns = _as_turns(messy)
+
+    assert len(turns) <= MAX_HISTORY_TURNS
+    assert all(t["role"] in ("user", "assistant") and t["content"].strip() for t in turns)
+
+
+def test_no_history_still_works():
+    from app.llm import _as_turns
+    assert _as_turns(None) == [] and _as_turns([]) == []

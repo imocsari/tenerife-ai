@@ -49,13 +49,30 @@ def generate(system, message):
 
 MAX_TOOL_ROUNDS = 6   # a wrong-footed model can loop; this bounds the damage and the bill
 
+# How many previous turns to carry. Enough for "near Los Cristianos" to still mean football,
+# not so many that an hour-old conversation is re-sent (and re-billed) on every question.
+# Only the text turns are kept, never the tool calls and their results: those are large,
+# already summarised in the answer the model gave, and replaying them teaches it to repeat
+# tool calls it has already made.
+MAX_HISTORY_TURNS = 8
 
-def _claude_tools(system, question):
+
+def _as_turns(history):
+    """[{role, content}] -> the last few clean user/assistant turns."""
+    turns = [
+        {"role": h["role"], "content": h["content"]}
+        for h in (history or [])
+        if h.get("role") in ("user", "assistant") and (h.get("content") or "").strip()
+    ]
+    return turns[-MAX_HISTORY_TURNS:]
+
+
+def _claude_tools(system, question, history=None):
     from anthropic import Anthropic
     from app import tools
 
     client = Anthropic()
-    messages = [{"role": "user", "content": question}]
+    messages = _as_turns(history) + [{"role": "user", "content": question}]
 
     for _ in range(MAX_TOOL_ROUNDS):
         response = client.messages.create(
@@ -85,14 +102,13 @@ def _claude_tools(system, question):
     return "I kept needing more information and ran out of steps before answering."
 
 
-def _ollama_tools(system, question):
+def _ollama_tools(system, question, history=None):
     import ollama
     from app import tools
 
-    messages = [
-        {"role": "system", "content": system},
-        {"role": "user", "content": question},
-    ]
+    messages = [{"role": "system", "content": system}]
+    messages += _as_turns(history)
+    messages.append({"role": "user", "content": question})
 
     for _ in range(MAX_TOOL_ROUNDS):
         response = ollama.chat(
@@ -125,10 +141,10 @@ def _ollama_tools(system, question):
 TOOL_PROVIDERS = {"claude": _claude_tools, "ollama": _ollama_tools}
 
 
-def generate_with_tools(system, question):
-    """Answer a question, letting the model call tools as it goes."""
+def generate_with_tools(system, question, history=None):
+    """Answer a question in the context of the conversation so far, calling tools as needed."""
     try:
         provider = TOOL_PROVIDERS[config.LLM_PROVIDER]
     except KeyError:
         raise ValueError(f"Unknown LLM_PROVIDER: {config.LLM_PROVIDER!r}")
-    return provider(system, question)
+    return provider(system, question, history)

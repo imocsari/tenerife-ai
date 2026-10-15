@@ -23,8 +23,17 @@ def home():
     return FileResponse(STATIC_DIR / "index.html")
 
 
+class Turn(BaseModel):
+    role: str
+    content: str
+
+
 class AskRequest(BaseModel):
     question: str
+    # The conversation so far, sent by the client. Keeping it there rather than in server
+    # memory means no sessions, no expiry and no state to lose when the process restarts —
+    # the page already has the thread on screen.
+    history: list[Turn] = []
 
 
 @app.get("/health")
@@ -34,4 +43,4 @@ def health():
 
 @app.post("/ask")
 def ask(request: AskRequest):
-    return rag.ask(request.question)
+    return rag.ask(request.question, [t.model_dump() for t in request.history])

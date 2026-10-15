@@ -16,7 +16,7 @@ def retrieve(question, top_k=config.TOP_K):
     return results[:top_k]
 
 
-def ask(question):
+def ask(question, history=None):
     """Answer a question, letting the model choose its own sources.
 
     Retrieval used to run unconditionally before every answer; now it is one tool among
@@ -27,7 +27,7 @@ def ask(question):
     from app.tools import knowledge
 
     knowledge.LAST_SOURCES.set([])
-    answer = llm.generate_with_tools(TOOL_SYSTEM_PROMPT, question)
+    answer = llm.generate_with_tools(TOOL_SYSTEM_PROMPT, question, history)
 
     # The model may search several times; show each source once, at its best score.
     best = {}
