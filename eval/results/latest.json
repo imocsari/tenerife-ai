@@ -1,52 +1,52 @@
 {
-  "timestamp": "2026-10-15T09:38:10",
-  "note": "",
+  "timestamp": "2026-10-15T09:43:20",
+  "note": "follow wikivoyage redirects",
   "summary": {
     "ALL": {
       "questions": 14,
-      "hit_rate": 0.909,
-      "mrr": 0.864,
-      "avg_seconds": 1.435
+      "hit_rate": 1.0,
+      "mrr": 0.955,
+      "avg_seconds": 1.524
     },
     "transport": {
       "questions": 4,
       "hit_rate": 1.0,
       "mrr": 1.0,
-      "avg_seconds": 2.96
+      "avg_seconds": 3.212
     },
     "en": {
       "questions": 12,
-      "hit_rate": 0.889,
-      "mrr": 0.833,
-      "avg_seconds": 1.541
+      "hit_rate": 1.0,
+      "mrr": 0.944,
+      "avg_seconds": 1.643
     },
     "beach": {
       "questions": 3,
       "hit_rate": 1.0,
       "mrr": 0.833,
-      "avg_seconds": 0.837
+      "avg_seconds": 0.87
     },
     "sights": {
       "questions": 3,
-      "hit_rate": 0.667,
-      "mrr": 0.667,
-      "avg_seconds": 0.823
+      "hit_rate": 1.0,
+      "mrr": 1.0,
+      "avg_seconds": 0.873
     },
     "food": {
       "questions": 1,
       "hit_rate": 1.0,
       "mrr": 1.0,
-      "avg_seconds": 0.79
+      "avg_seconds": 0.82
     },
     "es": {
       "questions": 2,
       "hit_rate": 1.0,
       "mrr": 1.0,
-      "avg_seconds": 0.8
+      "avg_seconds": 0.81
     },
     "refusal": {
       "questions": 3,
-      "avg_seconds": 0.827
+      "avg_seconds": 0.81
     }
   },
   "results": [
@@ -67,7 +67,7 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 9.06
+      "seconds": 9.87
     },
     {
       "id": "transport-02",
@@ -86,7 +86,7 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 1.19
+      "seconds": 1.18
     },
     {
       "id": "transport-03",
@@ -97,15 +97,15 @@
       "question": "How do I get from the airport to the south of the island?",
       "retrieved": [
         "Tenerife – By plane",
+        "San Cristóbal de La Laguna – By plane",
         "Los Cristianos – By car",
         "Airport Transfer to Playa de las Américas",
         "Puerto de la Cruz – By plane",
-        "Puerto de la Cruz – By car",
-        "Santa Cruz de Tenerife – By plane"
+        "Puerto de la Cruz – By car"
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.79
+      "seconds": 0.98
     },
     {
       "id": "beach-01",
@@ -124,7 +124,7 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.85
+      "seconds": 0.97
     },
     {
       "id": "beach-02",
@@ -143,7 +143,7 @@
       ],
       "hit": true,
       "reciprocal_rank": 0.5,
-      "seconds": 0.86
+      "seconds": 0.84
     },
     {
       "id": "sights-01",
@@ -153,16 +153,16 @@
       ],
       "question": "What is there to see in La Laguna?",
       "retrieved": [
+        "San Cristóbal de La Laguna – Introduction",
+        "San Cristóbal de La Laguna – See",
+        "San Cristóbal de La Laguna – Churches and cathedrals",
+        "San Cristóbal de La Laguna – Do",
         "Tenerife – Other water activities and tours",
-        "Tenerife – Culture",
-        "Tenerife – Other water activities and tours",
-        "La Rana",
-        "Tenerife – Culture",
-        "Tenerife – Culture"
+        "La Rana"
       ],
-      "hit": false,
-      "reciprocal_rank": 0.0,
-      "seconds": 0.82
+      "hit": true,
+      "reciprocal_rank": 1.0,
+      "seconds": 0.83
     },
     {
       "id": "sights-02",
@@ -176,12 +176,12 @@
         "Tenerife – Diving",
         "Teide National Park – Stay safe",
         "Santa Cruz de Tenerife – Climate",
-        "Teide National Park – Hiking",
+        "San Cristóbal de La Laguna – Climate",
         "Secret Volcano Tuk Tuk Tour: Tenerife & Adeje"
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.83
+      "seconds": 0.82
     },
     {
       "id": "sights-03",
@@ -200,7 +200,7 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.82
+      "seconds": 0.97
     },
     {
       "id": "food-01",
@@ -219,7 +219,7 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.79
+      "seconds": 0.82
     },
     {
       "id": "es-01",
@@ -238,7 +238,7 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.8
+      "seconds": 0.82
     },
     {
       "id": "es-02",
@@ -274,7 +274,7 @@
         "Pizzeria Regina Margherita (Adeje)",
         "Santa Cruz de Tenerife – Budget"
       ],
-      "seconds": 0.87
+      "seconds": 0.81
     },
     {
       "id": "refuse-02",
@@ -303,12 +303,12 @@
       "retrieved": [
         "Santa Cruz de Tenerife – Introduction",
         "Santa Cruz de Tenerife – See",
+        "San Cristóbal de La Laguna – History",
         "Tenerife – Understand",
         "Tenerife – Metropolitan region",
-        "Tenerife – Regions",
         "Kev’s Chillout Bar"
       ],
-      "seconds": 0.8
+      "seconds": 0.81
     }
   ]
 }
