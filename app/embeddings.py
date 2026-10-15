@@ -14,14 +14,22 @@ def _model():
     return SentenceTransformer(config.EMBED_MODEL)
 
 
+# e5 models are trained asymmetrically: the question and the thing being searched are
+# prefixed differently, and skipping the prefixes measurably weakens retrieval. The split
+# already exists here — embed() is only ever called on a question, embed_many() only on
+# documents during ingest — so the prefixes go on automatically rather than at call sites.
+QUERY_PREFIX = "query: "
+PASSAGE_PREFIX = "passage: "
+
+
 def embed(text):
-    """One text -> one vector (numpy array)."""
-    return _model().encode(text)
+    """One question -> one vector (numpy array)."""
+    return _model().encode(QUERY_PREFIX + text)
 
 
 def embed_many(texts, show_progress=False):
-    """Many texts -> many vectors. Much faster than calling embed() in a loop."""
-    return _model().encode(texts, show_progress_bar=show_progress)
+    """Many documents -> many vectors. Much faster than calling embed() in a loop."""
+    return _model().encode([PASSAGE_PREFIX + t for t in texts], show_progress_bar=show_progress)
 
 
 def to_pgvector(vector):

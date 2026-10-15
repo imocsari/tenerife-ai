@@ -19,7 +19,14 @@ EMBEDDED_CHUNKS_FILE = DATA_DIR / "chunks_with_embeddings.json"
 # bge-small unless they are regenerated: both models output 384 dimensions, so a mismatch raises no
 # error at all — it just silently returns meaningless rankings. (The old flat search.py had exactly
 # that bug: it embedded queries with MiniLM against bge-small chunks.)
-EMBED_MODEL = "BAAI/bge-small-en-v1.5"
+# Multilingual (2026-10-15). bge-small is English-only, which was fine for an English
+# travel guide and wrong for a tourist assistant: measured across the app's 8 languages,
+# the same question scored 0.77 in English but 0.65 in Russian, and Polish, Italian and
+# Hungarian returned the wrong venues outright — Polish asking for live music got a
+# sports bar. Same 384 dimensions, so the pgvector column is unchanged, but every stored
+# vector must be regenerated: a query embedded by one model against passages embedded by
+# another returns confident nonsense rather than an error.
+EMBED_MODEL = "intfloat/multilingual-e5-small"
 EMBED_DIM = 384          # must match EMBED_MODEL; used for the pgvector column
 
 # --- LLM --------------------------------------------------------------------
