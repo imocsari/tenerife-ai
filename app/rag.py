@@ -4,7 +4,7 @@
 
 from app import config, llm
 from app.embeddings import embed
-from app.prompts import SYSTEM_PROMPT, TOOL_SYSTEM_PROMPT, build_message
+from app.prompts import SYSTEM_PROMPT, build_message, tool_system_prompt
 from app.retrievers import app_data, wikivoyage
 
 
@@ -27,7 +27,7 @@ def ask(question, history=None):
     from app.tools import knowledge
 
     knowledge.LAST_SOURCES.set([])
-    answer = llm.generate_with_tools(TOOL_SYSTEM_PROMPT, question, history)
+    answer = llm.generate_with_tools(tool_system_prompt(), question, history)
 
     # The model may search several times; show each source once, at its best score.
     best = {}

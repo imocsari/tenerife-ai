@@ -181,6 +181,26 @@
   }
   @keyframes sweep { from { transform: translateX(-110%) } to { transform: translateX(260%) } }
 
+  .disclaimer {
+    margin: 2px 0 0; font-size: 12.5px; color: var(--text-2); text-align: center;
+  }
+  footer {
+    margin: 4px 0 20px; font-size: 11.5px; line-height: 1.7; color: var(--text-2);
+    text-align: center; border-top: 1px solid var(--line); padding-top: 14px;
+  }
+  footer a { color: var(--text-2); text-decoration: underline; text-underline-offset: 2px; }
+  footer a:hover { color: var(--primary); }
+
+  .rate { display: flex; gap: 6px; margin-top: 10px; }
+  .rate button {
+    all: unset; cursor: pointer; font-size: 15px; line-height: 1; padding: 5px 9px;
+    border-radius: 9px; border: 1px solid var(--line); opacity: .65;
+    transition: opacity .15s, border-color .15s, transform .15s;
+  }
+  .rate button:hover { opacity: 1; transform: translateY(-1px); border-color: var(--primary); }
+  .rate button[aria-pressed="true"] { opacity: 1; border-color: var(--primary); }
+  .rate .done { font-size: 12px; color: var(--text-2); align-self: center; }
+
   @media (prefers-reduced-motion: reduce) {
     .aurora i, .orb, .scan::after, .msg { animation: none !important; }
     .chip, button, input { transition: none; }
@@ -207,10 +227,25 @@
   <div class="chips" id="chips"></div>
   <div id="thread"></div>
 
+  <p class="disclaimer">
+    AI answers can be wrong — check times and prices with the venue or organiser before setting off.
+  </p>
+
   <form id="form" autocomplete="off">
     <div class="field"><input id="q" placeholder="e.g. where can I watch football tonight?" required></div>
     <button id="send">Ask</button>
   </form>
+  <footer>
+    Events and venues from TenerInfo · Bus times from
+    <a href="https://www.titsa.com" target="_blank" rel="noopener">TITSA</a> ·
+    Places from <a href="https://overturemaps.org" target="_blank" rel="noopener">Overture Maps</a>
+    (CDLA-Permissive-2.0) · Health services from
+    <a href="https://datos.tenerife.es" target="_blank" rel="noopener">Cabildo de Tenerife</a> ·
+    Guide text from <a href="https://en.wikivoyage.org" target="_blank" rel="noopener">Wikivoyage</a>
+    and <a href="https://en.wikipedia.org" target="_blank" rel="noopener">Wikipedia</a>
+    (CC BY-SA) · Weather from <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a> ·
+    Fuel prices from the Spanish government register
+  </footer>
 </main>
 
 <script>
@@ -281,6 +316,29 @@ function renderSources(list) {
   return wrap;
 }
 
+function rating(question) {
+  const wrap = document.createElement('div');
+  wrap.className = 'rate';
+  for (const [score, glyph] of [[1, '\u{1F44D}'], [-1, '\u{1F44E}']]) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = glyph; b.setAttribute('aria-pressed', 'false');
+    b.title = score === 1 ? 'Helpful' : 'Not helpful';
+    b.onclick = () => {
+      b.setAttribute('aria-pressed', 'true');
+      wrap.querySelectorAll('button').forEach(x => x.disabled = true);
+      const note = document.createElement('span');
+      note.className = 'done'; note.textContent = 'thanks';
+      wrap.append(note);
+      fetch('/feedback', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, score }),
+      }).catch(() => {});   // feedback is never worth interrupting the user for
+    };
+    wrap.append(b);
+  }
+  return wrap;
+}
+
 form.onsubmit = async (e) => {
   e.preventDefault();
   const question = input.value.trim();
@@ -308,6 +366,7 @@ form.onsubmit = async (e) => {
                  { role: 'assistant', content: data.answer });
     const srcs = renderSources(data.sources);
     if (srcs) pending.append(srcs);
+    pending.append(rating(question));
   } catch (err) {
     pending.textContent = 'Something went wrong: ' + err.message;
   } finally {
