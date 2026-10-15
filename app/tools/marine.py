@@ -54,6 +54,50 @@ def get_sea_conditions(place=None, latitude=None, longitude=None, days=2):
     return "\n".join(lines)
 
 
+def get_tides(place=None, latitude=None, longitude=None):
+    """Today's high and low water for a coastal point in Tenerife.
+
+    Derived from Open-Meteo's hourly sea level rather than a tide-table service: there is no
+    free keyless tide API for the Canaries, and the turning points of the sea-level curve are
+    the high and low water. Hourly sampling means the times are good to about half an hour —
+    fine for planning a walk to Garachico's rock pools, not for navigation.
+    """
+    lat, lon, where = resolve(place, latitude, longitude)
+    if lat is None:
+        return where
+
+    res = requests.get(MARINE, params={
+        "latitude": lat, "longitude": lon,
+        "hourly": "sea_level_height_msl",
+        "timezone": "Atlantic/Canary", "forecast_days": 1,
+    }, timeout=10)
+    if res.status_code == 400:
+        return (f"No tide data for {where} — that point is inland on the marine grid. "
+                "Try the harbour or the beach itself.")
+    res.raise_for_status()
+    hourly = res.json().get("hourly", {})
+    times, levels = hourly.get("time", []), hourly.get("sea_level_height_msl", [])
+    if not levels or all(v is None for v in levels):
+        return f"No tide data available for {where}."
+
+    turns = []
+    for i in range(1, len(levels) - 1):
+        a, b, c = levels[i - 1], levels[i], levels[i + 1]
+        if None in (a, b, c):
+            continue
+        if b >= a and b >= c:
+            turns.append(("High", times[i][11:16], b))
+        elif b <= a and b <= c:
+            turns.append(("Low", times[i][11:16], b))
+
+    if not turns:
+        return f"No clear high or low water found for {where} today."
+    lines = [f"Tides today at {where} (approximate, to within about half an hour):"]
+    lines += [f"  {kind} water {when} ({level:+.2f} m relative to mean sea level)"
+              for kind, when, level in turns]
+    return "\n".join(lines)
+
+
 TOOLS = {
     "get_sea_conditions": {
         "description": (
@@ -68,5 +112,13 @@ TOOLS = {
             "required": [],
         },
         "run": get_sea_conditions,
+    },
+    "get_tides": {
+        "description": (
+            "Today's approximate high and low water for a coastal point in Tenerife — for rock "
+            "pools, beach walks and snorkelling. Pass the place name."
+        ),
+        "parameters": {"type": "object", "properties": dict(LOCATION_PARAMS), "required": []},
+        "run": get_tides,
     },
 }

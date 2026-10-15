@@ -79,6 +79,35 @@ def get_weather(place=None, latitude=None, longitude=None, days=3):
     return "\n".join(lines)
 
 
+def get_sun_times(place=None, latitude=None, longitude=None, days=1):
+    """Sunrise and sunset for a place in Tenerife.
+
+    Its own tool rather than a line inside the forecast because it is asked on its own, and
+    for a reason specific to here: the island is far enough west in its timezone that sunset
+    runs late, and watching it from the west coast is a fixture of a visit.
+    """
+    from app.tools._located import resolve
+    lat, lon, where = resolve(place, latitude, longitude)
+    if lat is None:
+        return where
+
+    res = requests.get(FORECAST, params={
+        "latitude": lat, "longitude": lon,
+        "daily": "sunrise,sunset,daylight_duration",
+        "timezone": "Atlantic/Canary",
+        "forecast_days": max(1, min(int(days), 7)),
+    }, timeout=10)
+    res.raise_for_status()
+    day = res.json().get("daily", {})
+
+    lines = [f"Sun times for {where}"]
+    for i, date_str in enumerate(day.get("time", [])):
+        hours = (day.get("daylight_duration") or [0])[i] / 3600
+        lines.append(f"  {date_str}: sunrise {day['sunrise'][i][11:16]}, "
+                     f"sunset {day['sunset'][i][11:16]} ({hours:.1f} h of daylight)")
+    return "\n".join(lines)
+
+
 TOOLS = {
     "get_weather": {
         "description": (
@@ -97,5 +126,22 @@ TOOLS = {
             "required": [],
         },
         "run": get_weather,
+    },
+    "get_sun_times": {
+        "description": (
+            "Sunrise and sunset times for a place in Tenerife. Pass the place name; it finds "
+            "the coordinates itself."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "place": {"type": "string", "description": "Place name, e.g. 'Los Gigantes'"},
+                "latitude": {"type": "number", "description": "Latitude, if already known"},
+                "longitude": {"type": "number", "description": "Longitude, if already known"},
+                "days": {"type": "integer", "description": "How many days, 1-7 (default 1)"},
+            },
+            "required": [],
+        },
+        "run": get_sun_times,
     },
 }
