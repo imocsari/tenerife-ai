@@ -3,7 +3,7 @@
 # provider wants. Claude and Ollama disagree on the envelope but agree on JSON Schema,
 # so the schema is written once here and translated, rather than maintained twice.
 
-from app.tools import (air_quality, buses, currency, fuel, geocode, holidays,
+from app.tools import (air_quality, buses, currency, fuel, geocode, health, holidays,
                        knowledge, marine, weather)
 
 # name -> {"description", "parameters" (JSON Schema), "run" (callable)}
@@ -17,6 +17,7 @@ REGISTRY = {
     **buses.TOOLS,
     **currency.TOOLS,
     **fuel.TOOLS,
+    **health.TOOLS,
 }
 
 

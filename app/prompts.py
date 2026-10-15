@@ -44,6 +44,8 @@ TOOL_SYSTEM_PROMPT = (
     "- get_next_buses: real TITSA departures today, from a stop and optionally on to a second "
     "one. Use for any 'how do I get from X to Y'. If it finds nothing, try find_bus_stop to "
     "check the stop name, then ask again.\n"
+    "- find_health_service: nearest pharmacy, health centre, hospital or dentist, with phone "
+    "and distance. Use it whenever someone is unwell or needs medicine.\n"
     "- get_fuel_prices: cheapest petrol or diesel near a place.\n"
     "- convert_currency: live ECB rates. Never state an exchange rate from memory.\n"
     "- get_public_holidays: Canary Islands holidays — shops, offices and buses all change.\n"
