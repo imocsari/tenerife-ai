@@ -1,0 +1,54 @@
+# Tenerife AI — API image.
+#
+# Two things dominate the size and the cold start, and both are handled here rather than at
+# runtime: torch, which pulls a multi-gigabyte CUDA build by default when the CPU wheel is a
+# fraction of that and this never sees a GPU; and the embedding model, which is downloaded at
+# build time so a cold container answers immediately instead of fetching 120MB from Hugging
+# Face while someone waits.
+
+FROM python:3.13-slim AS base
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    # Where sentence-transformers caches models. Set explicitly so the build and the runtime
+    # user agree on it — otherwise the baked-in model is invisible and gets downloaded again.
+    HF_HOME=/opt/models \
+    TRANSFORMERS_OFFLINE=0
+
+WORKDIR /app
+
+# CPU-only torch first, so the heavy wheel is its own cache layer and the generic index does
+# not pull the CUDA build underneath it.
+RUN pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.14.1"
+
+COPY requirements.txt .
+# torch is excluded because the CPU wheel is already installed above — leaving it in lets pip
+# satisfy the pin from PyPI and quietly replace it with the CUDA build. duckdb is only used by
+# ingest/sync_overture_places.py, which is run by hand against the database, not by the API.
+RUN grep -viE '^(torch|duckdb|pytest|playwright)' requirements.txt > /tmp/runtime.txt \
+    && pip install -r /tmp/runtime.txt
+
+COPY app ./app
+
+# Bake the embedding model in. Must match app/config.py's EMBED_MODEL — a mismatch here means
+# a silent download on first use, not an error.
+RUN python -c "from sentence_transformers import SentenceTransformer; \
+    SentenceTransformer('intfloat/multilingual-e5-small')" \
+    && chmod -R a+rX /opt/models
+
+# Run as nobody. Nothing here writes to disk at runtime.
+RUN useradd --create-home --uid 10001 appuser
+USER appuser
+
+EXPOSE 8000
+
+# The container is only healthy once it can actually answer, not merely once the port is open.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=90s --retries=3 \
+    CMD python -c "import urllib.request,sys; \
+    sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=4).status==200 else 1)"
+
+# One worker by default: each loads its own copy of the embedding model, so workers cost
+# memory rather than being free. Raise WEB_CONCURRENCY only with the RAM to back it.
+ENV WEB_CONCURRENCY=1
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers ${WEB_CONCURRENCY}"]

@@ -1,0 +1,51 @@
+# Runs on every push and pull request. Deliberately needs no secrets: the tests fake the model,
+# the database and the HTTP APIs, so CI stays fast, free and cannot be broken by a third party
+# having a bad day.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          # CPU torch: the default wheel is a multi-gigabyte CUDA build that CI has no use for.
+          pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.14.1"
+          grep -viE '^(torch|playwright)' requirements.txt > /tmp/ci.txt
+          pip install -r /tmp/ci.txt pytest
+
+      - name: Tests
+        run: pytest -q
+
+      - name: Check the app imports and the tools all register
+        run: |
+          python -c "
+          from app import tools
+          from app.prompts import tool_system_prompt
+          names = sorted(tools.REGISTRY)
+          print(len(names), 'tools:', ', '.join(names))
+          assert len(names) >= 16, 'a tool stopped registering'
+          # Every tool must be offered to both providers, or one silently works and one does not.
+          assert {t['name'] for t in tools.anthropic_schemas()} == \
+                 {t['function']['name'] for t in tools.ollama_schemas()} == set(names)
+          assert 'Today is' in tool_system_prompt(), 'the prompt lost its date'
+          "
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the image
+        run: docker build -t tenerife-ai:ci .
