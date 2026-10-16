@@ -44,13 +44,21 @@ def ollama_schemas():
 
 def run(name, arguments):
     """Execute a tool by name. Never raises: a failed tool must come back to the model as
-    text it can reason about, not as an exception that kills the whole answer."""
+    text it can reason about, not as an exception that kills the whole answer.
+
+    Failures are also logged. Without that they were invisible: the model received the error,
+    wrote a polite "try again in a moment", and nothing anywhere recorded why — which is how a
+    production weather tool could fail every single time and look like a transient hiccup.
+    """
     tool = REGISTRY.get(name)
     if tool is None:
+        print(f"[tool] {name}: no such tool", flush=True)
         return f"No such tool: {name}. Available: {', '.join(REGISTRY)}"
     try:
         return tool["run"](**(arguments or {}))
     except TypeError as e:
+        print(f"[tool] {name} bad arguments {arguments!r}: {e}", flush=True)
         return f"Wrong arguments for {name}: {e}"
     except Exception as e:
+        print(f"[tool] {name} failed: {type(e).__name__}: {e}", flush=True)
         return f"{name} failed: {type(e).__name__}: {e}"
