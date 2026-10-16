@@ -8,6 +8,7 @@
 import requests
 
 from app.tools._cache import cached
+from app.tools._located import resolve
 
 FORECAST = "https://api.open-meteo.com/v1/forecast"
 
@@ -34,19 +35,12 @@ def get_weather(place=None, latitude=None, longitude=None, days=3):
     removes the step they cannot take, while coordinates still work for models that chain.
     """
     days = max(1, min(int(days), 7))
-    if latitude is None or longitude is None:
-        if not place:
-            return "Give me either a place name or both latitude and longitude."
-        from app.tools.geocode import geocode_place
-        located = geocode_place(place)
-        try:
-            latitude = float([l for l in located.splitlines() if l.startswith("latitude")][0].split(": ")[1])
-            longitude = float([l for l in located.splitlines() if l.startswith("longitude")][0].split(": ")[1])
-        except (IndexError, ValueError):
-            return located   # the geocoder's own "no such place" message
-        where = located.splitlines()[0]
-    else:
-        where = f"{float(latitude):.4f}, {float(longitude):.4f}"
+    # Via the shared resolver, which looks in our own data first. This function predates
+    # _located.py and kept its own inline call to Nominatim — which is why it was the one tool
+    # that failed on the first production deploy while everything local answered fine.
+    latitude, longitude, where = resolve(place, latitude, longitude)
+    if latitude is None:
+        return where
     res = requests.get(
         FORECAST,
         params={

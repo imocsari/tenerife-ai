@@ -1,52 +1,74 @@
 {
-  "timestamp": "2026-10-15T09:43:20",
-  "note": "follow wikivoyage redirects",
+  "timestamp": "2026-10-15T09:52:45",
+  "note": "prompt v2: less hedging, no outside facts",
   "summary": {
     "ALL": {
       "questions": 14,
       "hit_rate": 1.0,
       "mrr": 0.955,
-      "avg_seconds": 1.524
+      "refusal_accuracy": 1.0,
+      "wrong_refusals": 0.273,
+      "contains_expected": 1.0,
+      "faithfulness": 0.929,
+      "avg_seconds": 4.645
     },
     "transport": {
       "questions": 4,
       "hit_rate": 1.0,
       "mrr": 1.0,
-      "avg_seconds": 3.212
+      "wrong_refusals": 0.25,
+      "contains_expected": 1.0,
+      "faithfulness": 1.0,
+      "avg_seconds": 6.27
     },
     "en": {
       "questions": 12,
       "hit_rate": 1.0,
       "mrr": 0.944,
-      "avg_seconds": 1.643
+      "refusal_accuracy": 1.0,
+      "wrong_refusals": 0.222,
+      "contains_expected": 1.0,
+      "faithfulness": 0.917,
+      "avg_seconds": 4.747
     },
     "beach": {
       "questions": 3,
       "hit_rate": 1.0,
       "mrr": 0.833,
-      "avg_seconds": 0.87
+      "wrong_refusals": 0.333,
+      "contains_expected": 1.0,
+      "faithfulness": 0.667,
+      "avg_seconds": 4.22
     },
     "sights": {
       "questions": 3,
       "hit_rate": 1.0,
       "mrr": 1.0,
-      "avg_seconds": 0.873
+      "wrong_refusals": 0.333,
+      "faithfulness": 1.0,
+      "avg_seconds": 3.907
     },
     "food": {
       "questions": 1,
       "hit_rate": 1.0,
       "mrr": 1.0,
-      "avg_seconds": 0.82
+      "wrong_refusals": 0.0,
+      "faithfulness": 1.0,
+      "avg_seconds": 4.5
     },
     "es": {
       "questions": 2,
       "hit_rate": 1.0,
       "mrr": 1.0,
-      "avg_seconds": 0.81
+      "wrong_refusals": 0.5,
+      "faithfulness": 1.0,
+      "avg_seconds": 4.03
     },
     "refusal": {
       "questions": 3,
-      "avg_seconds": 0.81
+      "refusal_accuracy": 1.0,
+      "faithfulness": 1.0,
+      "avg_seconds": 3.69
     }
   },
   "results": [
@@ -67,7 +89,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 9.87
+      "answer": "I don't have information about transportation methods to reach Teide National Park in the sources provided.\n\nHowever, I can tell you that the park is located in the municipality of La Orotava, and there's a free visitor centre there worth visiting (Source 3). You could ask about specific transport options like bus routes, car rentals, or organized tours from your accommodation!",
+      "wrongly_refused": true,
+      "faithful": true,
+      "seconds": 13.33
     },
     {
       "id": "transport-02",
@@ -86,7 +111,11 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 1.18
+      "answer": "Yes, you can take a ferry to La Gomera from the south of Tenerife. Los Cristianos Port has daily ferry connections to La Gomera, operated by Fred Olsen and Armas ferry companies (Source 4). Several day trip tours also depart from South Tenerife with hotel pickup included, making it convenient to reach the port (Sources 1, 3).",
+      "wrongly_refused": false,
+      "contains_expected": true,
+      "faithful": true,
+      "seconds": 3.29
     },
     {
       "id": "transport-03",
@@ -105,7 +134,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.98
+      "answer": "You have several options to reach the south of the island from the airport (Sources 1, 3, 5):\n\n• **By bus**: Titsa buses run from both airports to other towns, though you may need to change routes. They operate from around 05:00-06:00 until midnight.\n\n• **By taxi**: From Tenerife South Airport (the closer option), it's only about 15 minutes to Los Cristianos in the south. From the northern airport, taxis are also available but the journey is longer.\n\n• **By private transfer**: You can pre-book a private airport transfer with fixed fares and meet-and-greet service (Source 4).\n\n• **By car**: If renting a car, take the TF-1 motorway from either airport to reach the southern areas (Source 3).",
+      "wrongly_refused": false,
+      "faithful": true,
+      "seconds": 4.42
     },
     {
       "id": "beach-01",
@@ -124,7 +156,11 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.97
+      "answer": "Los Cristianos has great options for swimming with kids! You can visit the **Piscina municipal (public swimming pool)** in town, or take advantage of the area's famous **sandy beaches** that Los Cristianos is known for (Source 1, 6). If your kids enjoy more adventure, there's also the **Xplore Tenerife Kayaking tour** which is beginner-friendly and includes snorkelling—it requires a minimum age of 14 and the ability to swim (Source 4).",
+      "wrongly_refused": false,
+      "contains_expected": true,
+      "faithful": true,
+      "seconds": 3.64
     },
     {
       "id": "beach-02",
@@ -143,7 +179,11 @@
       ],
       "hit": true,
       "reciprocal_rank": 0.5,
-      "seconds": 0.84
+      "answer": "The sources I have don't contain specific information about beaches in Santa Cruz de Tenerife itself. However, I can tell you that nearby Puerto de la Cruz (a separate city) is home to Playa Jardín beach, and there's the Andana Beach Club located there (Source 1). You might want to ask specifically about beaches in Puerto de la Cruz, or search for beach information focused on the Santa Cruz area.",
+      "wrongly_refused": false,
+      "contains_expected": true,
+      "faithful": false,
+      "seconds": 5.0
     },
     {
       "id": "sights-01",
@@ -162,7 +202,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.83
+      "answer": "La Laguna's historic centre is a UNESCO World Heritage Site well worth exploring on its own (Source 1). Key sights include churches along Calle de San Agustín – the Church of the Immaculate Conception, Casa Salazar, Church of St. Dominic, and Church-convent of Santa Catalina de Siena – accessible with a single €2 ticket (Source 2). The most important religious building is the Royal Sanctuary of the Christ of La Laguna on Plaza San Francisco, which houses the venerated Cristo de La Laguna and an exact replica of the Shroud of Turin (Source 3). You can also visit the Leal Theater, an impressively renovated eclectic-style theatre, or the Anaga National Park Visitor Centre to pick up hiking maps (Source 4).",
+      "wrongly_refused": false,
+      "faithful": true,
+      "seconds": 4.11
     },
     {
       "id": "sights-02",
@@ -181,7 +224,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.82
+      "answer": "Yes, it's very cold at the top of El Teide. Even if beaches are warm, the summit can be freezing with snow common until March/April. Strong winds at the peak significantly reduce the apparent temperature even further. You'll also need strong sun protection since the rocks offer little shelter from the elements. (Source 3)",
+      "wrongly_refused": false,
+      "faithful": true,
+      "seconds": 3.44
     },
     {
       "id": "sights-03",
@@ -200,7 +246,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.97
+      "answer": "The sources I have focus on outdoor attractions in Puerto de la Cruz, like Lago Martiánez swimming complex and the old town's colonial streets, which aren't ideal for rainy weather. I don't have information about indoor activities there. You could ask about indoor attractions, museums, or covered markets in Puerto de la Cruz instead!",
+      "wrongly_refused": true,
+      "faithful": true,
+      "seconds": 4.17
     },
     {
       "id": "food-01",
@@ -219,7 +268,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.82
+      "answer": "You should definitely try traditional Canarian dishes at **guachinches** – local taverns serving homemade food like grilled fish, roasted meat, and various stews, all for just a few euros. These places also serve their own wine, giving you an authentic local experience (Source 1).\n\nFor drinks, sample **local wines** from the north of the island, particularly those made from the malvasia grape variety with a long export tradition, or try **Dorada** and **Reine** beers produced locally. The island also produces unique **banana liqueurs** thanks to its abundant fruits (Source 4).\n\nIf you want fresh fish, head to Santa Cruz de Tenerife or ask locals for recommendations – plenty of good fish is available, though a dictionary might help with the names (Source 3).",
+      "wrongly_refused": false,
+      "faithful": true,
+      "seconds": 4.5
     },
     {
       "id": "es-01",
@@ -238,7 +290,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.82
+      "answer": "Puedes llegar al Teide Nacional Park en alrededor de 90 minutos desde La Orotava o Vilaflor (Fuente 5). Una vez allí, tienes varias opciones: subir en el **teleférico del Teide** (Teleférico del Teide Base Station a 2,356m) para alcanzar los 3,555m en 8 minutos, o hacer **senderismo** si prefieres una experiencia más activa. También puedes explorar el parque en **buggy** con tours guiados que suben hasta 2,200m (Fuente 2, 4).",
+      "wrongly_refused": false,
+      "faithful": true,
+      "seconds": 4.04
     },
     {
       "id": "es-02",
@@ -257,7 +312,10 @@
       ],
       "hit": true,
       "reciprocal_rank": 1.0,
-      "seconds": 0.8
+      "answer": "No tengo información en mis fuentes sobre playas tranquilas específicamente para niños cerca de Los Cristianos. ¿Podrías preguntarme sobre restaurantes, bares o alojamientos en la zona, o sobre qué hace especial a Los Cristianos como destino turístico?",
+      "wrongly_refused": true,
+      "faithful": true,
+      "seconds": 4.02
     },
     {
       "id": "refuse-01",
@@ -274,7 +332,10 @@
         "Pizzeria Regina Margherita (Adeje)",
         "Santa Cruz de Tenerife – Budget"
       ],
-      "seconds": 0.81
+      "answer": "I don't have information about pizza places in Madrid—my sources are all about Tenerife. \n\nWould you like to know about the best pizza restaurants in Tenerife instead? I have several great options across different areas like El Médano, Los Cristianos, and Costa Adeje.",
+      "refused_correctly": true,
+      "faithful": true,
+      "seconds": 3.8
     },
     {
       "id": "refuse-02",
@@ -291,7 +352,10 @@
         "Puerto de la Cruz – Splurge",
         "Paradise Park Hotel"
       ],
-      "seconds": 0.81
+      "answer": "I don't know of any hotels in Paris from my sources, as I'm a guide specifically for Tenerife. \n\nCould you ask me instead about hotels in Tenerife? I'd be happy to help you find accommodation in areas like Puerto de la Cruz, Santa Cruz, Los Cristianos, or smaller towns!",
+      "refused_correctly": true,
+      "faithful": true,
+      "seconds": 3.65
     },
     {
       "id": "refuse-03",
@@ -308,7 +372,10 @@
         "Tenerife – Metropolitan region",
         "Kev’s Chillout Bar"
       ],
-      "seconds": 0.81
+      "answer": "I don't know the answer from my sources, as they only cover Tenerife and the Canary Islands. \n\nYou could ask me about Tenerife instead—for example, which cities to visit, what to see, or where to eat!",
+      "refused_correctly": true,
+      "faithful": true,
+      "seconds": 3.62
     }
   ]
 }

@@ -14,6 +14,17 @@
 
 from app.db import connection
 
+# Everything this assistant answers is about one island, so a coordinate outside it is wrong by
+# definition rather than merely unexpected. Nominatim's viewbox only *prefers* a region: asked
+# for "Las Cañadas del Teide" it happily returned 40.29, -3.75 — a spot near Madrid — and the
+# forecast call then failed on coordinates nobody would have questioned if it had not.
+TENERIFE_BOUNDS = (27.95, 28.65, -17.00, -16.05)   # south, north, west, east
+
+
+def _in_tenerife(lat, lon):
+    south, north, west, east = TENERIFE_BOUNDS
+    return south <= lat <= north and west <= lon <= east
+
 # Ranked: an area centroid beats a single venue that happens to share the name, and TenerInfo's
 # own data beats Overture's. Ties break on how closely the name matches.
 RESOLVE_SQL = """
@@ -72,6 +83,20 @@ def resolve(place=None, latitude=None, longitude=None):
     if local:
         return local
 
+    # Try the distinctive words on their own. "Las Cañadas del Teide" matches nothing we hold
+    # as a whole string, while "Teide" matches exactly — and a global gazetteer asked for the
+    # full phrase cheerfully answered with a spot near Madrid. Longest word first, since that
+    # is usually the proper noun rather than the scaffolding around it.
+    STOPWORDS = {"las", "los", "del", "de", "la", "el", "playa", "puerto", "san", "santa"}
+    words = sorted((w for w in place.replace(",", " ").split()
+                    if len(w) > 3 and w.lower() not in STOPWORDS),
+                   key=len, reverse=True)
+    for word in words[:2]:
+        local = _from_our_data(word)
+        if local:
+            lat, lon, label = local
+            return lat, lon, label
+
     # Nothing we hold matches — ask Nominatim, which may well refuse from a datacenter.
     from app.tools.geocode import geocode_place
     located = geocode_place(place)
@@ -81,6 +106,11 @@ def resolve(place=None, latitude=None, longitude=None):
     except (IndexError, ValueError):
         return None, None, (f"I could not work out where {place!r} is. "
                             "Try a nearby town or resort name.")
+    if not _in_tenerife(lat, lon):
+        print(f"[resolve] {place!r} geocoded to {lat:.4f},{lon:.4f} — outside Tenerife, rejected",
+              flush=True)
+        return None, None, (f"I could only find {place!r} outside Tenerife, so I have not used "
+                            "it. Try a Tenerife town, resort or landmark.")
     return lat, lon, located.splitlines()[0]
 
 

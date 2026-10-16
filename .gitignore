@@ -20,3 +20,5 @@ events.json
 # Editor settings
 .vscode/
 .idea/
+.vercel
+.env*
